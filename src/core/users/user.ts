@@ -18,3 +18,5 @@ export type NewUser = Pick<User, "firstName" | "lastName" | "email"> &
   Partial<
     Pick<User, "role" | "phoneNumber" | "passwordHash" | "emailVerifiedAt">
   >;
+
+export type UserChanges = Partial<Omit<User, "id" | "createdAt" | "updatedAt">>;
