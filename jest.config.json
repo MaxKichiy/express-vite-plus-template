@@ -1,0 +1,11 @@
+{
+  "collectCoverageFrom": ["<rootDir>/src/**/*.ts"],
+  "coveragePathIgnorePatterns": ["<rootDir>/build/", "<rootDir>/node_modules/"],
+  "modulePathIgnorePatterns": ["<rootDir>/build/", "<rootDir>/src/generated/"],
+  "preset": "ts-jest",
+  "setupFilesAfterEnv": ["dotenv/config"],
+  "testEnvironment": "node",
+  "transform": {
+    "^.+.tsx?$": ["ts-jest", {}]
+  }
+}
