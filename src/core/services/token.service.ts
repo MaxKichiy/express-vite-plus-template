@@ -1,10 +1,11 @@
 import { Unauthorized } from "http-errors";
 
 import { errors } from "../../constants/error.constant";
-import { User, UserRole } from "../../generated/prisma/client";
+import { UserRole } from "../../generated/prisma/client";
 import { ITokenSigner } from "../interfaces/ITokenSigner";
 import z from "zod";
-import { IUserLookup } from "../interfaces/IUserLookup";
+import { User } from "../users/user";
+import { UserService } from "../users/user.service";
 
 const AccessClaims = z.object({
   type: z.literal("access"),
@@ -17,7 +18,7 @@ const RefreshClaims = z.object({ type: z.literal("refresh"), id: z.string() });
 export class TokenService {
   constructor(
     private readonly signer: ITokenSigner,
-    private readonly userService: IUserLookup,
+    private readonly userService: UserService,
     private readonly ttl: { access: number; refresh: number },
   ) {}
 

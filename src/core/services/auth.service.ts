@@ -1,25 +1,15 @@
-import bcryptjs from "bcryptjs";
-import {
-  BadRequest,
-  Conflict,
-  InternalServerError,
-  NotFound,
-  Unauthorized,
-} from "http-errors";
-
-import * as Sentry from "@sentry/node";
 import { errors } from "../../constants/error.constant";
-import { Prisma, UserRole } from "../../generated/prisma/client";
-import { GoogleProvider } from "../../providers/google.provider";
-import { PasswordResetRepository } from "../../repositories/password-reset.repository";
-import { GoogleUserService } from "./google-user.service";
-import { LogService } from "./log.service";
 import { TokenService } from "./token.service";
 import { UserService } from "../users/user.service";
 import { EmailService } from "@src/core/services/email/email.service";
 import { EmailVerificationService } from "@src/core/services/email-verification.service";
-import { prisma } from "@src/infrastructure/database/prisma";
 import { AppError } from "../error";
+import { IPasswordResetsRepository } from "../interfaces/IPasswordResetsRepository";
+import { LogService } from "./log.service";
+import { IUnitOfWork } from "../interfaces/IUnitOfWork";
+import { IPasswordEncryption } from "../interfaces/IPasswordEncryption";
+import { IGoogleVerifier } from "../interfaces/IGoogleVerifier";
+import { randomUUID } from "crypto";
 
 export interface SignUpInput {
   firstName: string;
@@ -30,28 +20,26 @@ export interface SignUpInput {
 }
 
 export class AuthService {
-  private readonly googleUserService: GoogleUserService =
-    new GoogleUserService();
-  private readonly logService: LogService = new LogService();
-  private readonly passwordResetRepository: PasswordResetRepository =
-    new PasswordResetRepository();
-  private readonly googleProvider: GoogleProvider = new GoogleProvider();
-
   constructor(
     private readonly emailService: EmailService,
     private readonly tokenService: TokenService,
     private readonly emailVerificationService: EmailVerificationService,
     private readonly userService: UserService,
+    private readonly uow: IUnitOfWork,
+    private readonly logService: LogService,
+    private readonly passwordResetRepository: IPasswordResetsRepository,
+    private readonly passwordEncryptionService: IPasswordEncryption,
+    private readonly google: IGoogleVerifier,
   ) {}
 
   async login(email: string, password: string) {
     const user = await this.userService.findByEmailWithPassword(email);
 
     if (!user) {
-      throw new BadRequest(errors.INVALID_CREDENTIALS);
+      throw new AppError("INVALID_CREDENTIALS");
     }
 
-    const isPasswordValid = await bcryptjs.compare(
+    const isPasswordValid = await this.passwordEncryptionService.compare(
       password,
       user.passwordHash!,
     );
@@ -72,141 +60,107 @@ export class AuthService {
     const user = await this.userService.findByEmail(email);
 
     if (user) {
-      throw new Conflict(errors.USER_ALREADY_EXIST);
+      throw new AppError("USER_ALREADY_EXIST");
     }
 
-    const passwordHash = await bcryptjs.hash(password, 12);
+    const passwordHash = await this.passwordEncryptionService.hash(password);
 
-    const userToCreate = {
-      firstName,
-      lastName,
-      email,
-      phoneNumber,
-      passwordHash,
-      role: UserRole.USER,
-    };
+    const { createdUser, token } = await this.uow.runInTransaction(
+      async ({ users, emailVerifications }) => {
+        const createdUser = await users.create({
+          firstName,
+          lastName,
+          email,
+          phoneNumber,
+          passwordHash,
+          role: "USER",
+        });
 
-    return await prisma.$transaction(async (tx) => {
-      const createdUser = await this.userService.create(userToCreate, tx);
+        const token = randomUUID();
+        await emailVerifications.create(createdUser.id, token);
+        return { createdUser, token };
+      },
+    );
+    await this.emailService.sendVerificationEmail(createdUser.email, token);
 
-      const [accessToken, refreshToken] = await Promise.all([
-        this.tokenService.generateAccessToken(createdUser),
-        this.tokenService.generateRefreshToken(createdUser),
-      ]);
-
-      await this.emailVerificationService.sendEmailVerification(
-        createdUser.id,
-        createdUser.email,
-        tx,
-      );
-
-      return { accessToken, currentUser: createdUser, refreshToken };
-    });
+    const [accessToken, refreshToken] = await Promise.all([
+      this.tokenService.generateAccessToken(createdUser),
+      this.tokenService.generateRefreshToken(createdUser),
+    ]);
+    return { accessToken, currentUser: createdUser, refreshToken };
   }
 
   async googleAuth(credential: string) {
-    const googleClient = this.googleProvider.getGoogleClient();
+    const identity = await this.google.verify(credential);
+    if (!identity) throw new AppError("INVALID_CREDENTIALS");
 
-    const ticket = await googleClient.verifyIdToken({
-      idToken: credential,
-    });
+    const user = await this.uow.runInTransaction(
+      async ({ users, googleUsers }) => {
+        const link = await googleUsers.findGoogleUserByUserId(
+          identity.googleAccountId,
+        );
 
-    const payload = ticket.getPayload();
+        if (link) {
+          const existingUser = await users.findById(link.userId);
+          if (!existingUser) throw new AppError("USER_NOT_FOUND");
+          return existingUser;
+        }
 
-    if (
-      !payload ||
-      !payload.email ||
-      !payload.given_name ||
-      !payload.family_name
-    ) {
-      //TODO: check how it will work after testsing. AI tells me that I should create separate class for it in lesson 9 or 10.
-      throw new Unauthorized(errors.INVALID_CREDENTIALS);
-    }
+        let user = await users.findByEmail(identity?.email);
+        if (!user) {
+          user = await users.create({
+            email: identity.email,
+            firstName: identity.firstName,
+            lastName: identity.lastName,
+            emailVerifiedAt: new Date(),
+          });
+        } else if (!user.emailVerifiedAt) {
+          user = await users.update(user.id, {
+            emailVerifiedAt: new Date(),
+            passwordHash: null,
+          });
+        }
 
-    let [existingGoogleUser, existingUser] = await Promise.all([
-      this.googleUserService.findByEmail(payload.email),
-      this.userService.findByEmail(payload.email),
+        await googleUsers.create({
+          userId: user.id,
+          googleAccountId: identity.googleAccountId,
+          email: identity.email,
+          firstName: identity.firstName,
+          lastName: identity.lastName,
+        });
+
+        return user;
+      },
+    );
+
+    const [accessToken, refreshToken] = await Promise.all([
+      this.tokenService.generateAccessToken(user),
+      this.tokenService.generateRefreshToken(user),
     ]);
-
-    const userData: Prisma.UserCreateInput = {
-      email: payload.email,
-      firstName: payload.given_name,
-      lastName: payload.family_name,
-      emailVerifiedAt: new Date(),
-    };
-
-    const googleUserData: Omit<Prisma.GoogleUserCreateInput, "user"> = {
-      googleAccountId: payload.sub!,
-      firstName: payload.given_name,
-      lastName: payload.family_name,
-      email: payload.email,
-      emailVerified: true,
-    };
-
-    return await prisma.$transaction(async (tx) => {
-      if (existingUser && !existingGoogleUser) {
-        existingGoogleUser = await this.googleUserService.create(
-          existingUser.id,
-          googleUserData,
-          tx,
-        );
-      } else if (!existingUser && existingGoogleUser) {
-        existingGoogleUser = await this.googleUserService.update(
-          existingGoogleUser.id,
-          googleUserData,
-          tx,
-        );
-
-        existingUser = await this.userService.create(userData, tx);
-      } else {
-        existingUser = await this.userService.create(userData, tx);
-
-        existingGoogleUser = await this.googleUserService.create(
-          existingUser.id,
-          googleUserData,
-          tx,
-        );
-      }
-
-      if (!existingUser.emailVerifiedAt) {
-        existingUser = await this.userService.update(
-          existingUser.id,
-          { emailVerifiedAt: new Date() },
-          tx,
-        );
-      }
-
-      const [accessToken, refreshToken] = await Promise.all([
-        this.tokenService.generateAccessToken(existingUser),
-        this.tokenService.generateRefreshToken(existingUser),
-      ]);
-
-      return { accessToken, currentUser: existingUser, refreshToken };
-    });
+    return { accessToken, currentUser: user, refreshToken };
   }
 
   async verifyEmail(userId: string, token: string) {
     const user = await this.userService.findById(userId);
 
     if (!user) {
-      throw new InternalServerError(errors.USER_NOT_FOUND);
+      throw new AppError("USER_NOT_FOUND");
     }
 
-    return await prisma.$transaction(async (tx) => {
-      await this.emailVerificationService.validateEmailVerification(
-        userId,
-        token,
-        tx,
-      );
+    return await this.uow.runInTransaction(
+      async ({ users, emailVerifications }) => {
+        await new EmailVerificationService(
+          this.emailService,
+          this.userService,
+          emailVerifications,
+        ).validateEmailVerification(userId, token);
 
-      const currentUser = await this.userService.update(
-        userId,
-        { emailVerifiedAt: new Date() },
-        tx,
-      );
-
-      return { currentUser };
-    });
+        const currentUser = await new UserService(users).update(userId, {
+          emailVerifiedAt: new Date(),
+        });
+        return { currentUser };
+      },
+    );
   }
 
   async resendVerification(userId: string, email: string) {
@@ -226,46 +180,42 @@ export class AuthService {
 
   async forgotPassword(email: string): Promise<void> {
     const user = await this.userService.findByEmail(email);
-
     if (!user) {
       return;
     }
+    const token = await this.uow.runInTransaction(
+      async ({ passwordResets, logs }) => {
+        const r = await passwordResets.create(user.id);
+        await new LogService(logs).recordForgotPassword(user.id);
 
-    await prisma.$transaction(async (tx) => {
-      const passwordReset = await this.passwordResetRepository.create(
-        user.id,
-        tx,
-      );
-      await this.logService.recordForgotPassword(user.id, tx);
+        return r;
+      },
+    );
 
-      try {
-        await this.emailService.sendResetPasswordEmail(
-          user.email,
-          passwordReset.token,
-        );
-      } catch (err) {
-        Sentry.captureException(err);
-        throw new InternalServerError(errors.EMAIL_NOT_SENT);
-      }
-    });
+    try {
+      await this.emailService.sendResetPasswordEmail(user.email, token);
+    } catch (err) {
+      throw new AppError("EMAIL_NOT_SENT", { cause: err });
+    }
   }
 
   async resetPassword(token: string, newPassword: string): Promise<void> {
-    const passwordResetRecord = await this.passwordResetRepository.find(token);
+    const record = await this.passwordResetRepository.find(token);
 
-    if (!passwordResetRecord) {
-      throw new NotFound(errors.PASSWORD_RESET_TOKEN_NOT_FOUND);
+    if (!record) {
+      throw new AppError("PASSWORD_RESET_TOKEN_NOT_FOUND");
     }
 
-    const user = await this.userService.findByIdOrThrow(
-      passwordResetRecord.userId,
-    );
-    const passwordHash = await bcryptjs.hash(newPassword, 12);
+    const passwordHash = await this.passwordEncryptionService.hash(newPassword);
 
-    await prisma.$transaction(async (tx) => {
-      await this.userService.update(user.id, { passwordHash }, tx);
-      await this.passwordResetRepository.expire(passwordResetRecord.id, tx);
-      await this.logService.recordPasswordReset(user.id, tx);
+    await this.uow.runInTransaction(async ({ users, passwordResets, logs }) => {
+      const user = await users.findById(record.userId);
+      if (!user) {
+        throw new AppError("USER_NOT_FOUND");
+      }
+      await users.update(user.id, { passwordHash });
+      await passwordResets.expire(record.id);
+      await new LogService(logs).recordPasswordReset(user.id);
     });
   }
 }

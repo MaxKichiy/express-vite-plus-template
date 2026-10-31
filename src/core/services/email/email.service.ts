@@ -4,13 +4,14 @@ import {
   verificationEmail,
 } from "@src/core/services/email/email-templates";
 import { IEmailProvider } from "../../interfaces/IEmailProvider";
+import { PasswordReset } from "@src/core/interfaces/IPasswordResetsRepository";
 
 export class EmailService {
   constructor(private readonly mailer: IEmailProvider) {}
 
   async sendResetPasswordEmail(
     receiverEmail: string,
-    passwordResetToken: string,
+    passwordResetToken: PasswordReset,
   ) {
     const passwordResetUrl = `${env.APP_URL}/password-reset?token=${passwordResetToken}`;
     const { to, subject, body } = resetPasswordEmail(
