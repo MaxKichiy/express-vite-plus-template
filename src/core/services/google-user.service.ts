@@ -1,41 +1,37 @@
-import { prisma } from "@src/infrastructure/database/prisma";
 import { Prisma, GoogleUser } from "@src/generated/prisma/client";
-import { GoogleUserRepository } from "@src/repositories/google-user.repository";
+import { PrismaGoogleUserRepository } from "@src/infrastructure/repositories/prisma-google-user.repository";
 
 export class GoogleUserService {
-  private readonly googleUserRepository: GoogleUserRepository =
-    new GoogleUserRepository();
+  constructor(
+    private readonly googleUserRepository: PrismaGoogleUserRepository,
+  ) {}
 
   async create(
     userId: string,
     googleUser: Omit<Prisma.GoogleUserCreateInput, "user">,
-    tx: Prisma.TransactionClient = prisma,
   ): Promise<GoogleUser> {
-    return await this.googleUserRepository.create(
-      {
-        ...googleUser,
-        user: {
-          connect: {
-            id: userId,
-          },
+    return await this.googleUserRepository.create({
+      ...googleUser,
+      user: {
+        connect: {
+          id: userId,
         },
       },
-      tx,
-    );
+    });
   }
 
-  async findByEmail(
-    email: string,
-    tx: Prisma.TransactionClient = prisma,
-  ): Promise<GoogleUser | null> {
-    return await this.googleUserRepository.findOneByEmail(email, tx);
+  async findByEmail(email: string): Promise<GoogleUser | null> {
+    return await this.googleUserRepository.findOneByEmail(email);
   }
 
   async update(
     id: string,
     data: Prisma.GoogleUserUpdateInput,
-    tx: Prisma.TransactionClient = prisma,
   ): Promise<GoogleUser> {
-    return await this.googleUserRepository.update(id, data, tx);
+    return await this.googleUserRepository.update(id, data);
+  }
+
+  async findGoogleUserByUserId(userId: string): Promise<GoogleUser | null> {
+    return await this.googleUserRepository.findGoogleUserByUserId(userId);
   }
 }

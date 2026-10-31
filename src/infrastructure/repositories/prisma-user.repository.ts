@@ -1,9 +1,8 @@
-import { PrismaClient } from "@prisma/client/extension";
-import { IUserRepository } from "@src/core/users/user-repository.port";
-import { User } from "@src/generated/prisma/client";
+import { IUserRepository } from "@src/core/users/IUserRepository";
+import { Prisma, User } from "@src/generated/prisma/client";
 
 export class PrismaUserRepository implements IUserRepository {
-  constructor(private readonly db: PrismaClient) {}
+  constructor(private readonly db: Prisma.TransactionClient) {}
 
   async create(user: User) {
     return await this.db.user.create({ data: user });

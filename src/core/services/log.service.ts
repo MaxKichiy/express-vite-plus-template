@@ -1,8 +1,7 @@
-import { Prisma } from "@src/generated/prisma/client";
-import { LogRepository } from "@src/repositories/log.repository";
+import { ILogRepository } from "../interfaces/ILogRepository";
 
 export class LogService {
-  private logRepository: LogRepository = new LogRepository();
+  constructor(private readonly logRepository: ILogRepository) {}
 
   async recordLoginAttempt(userId: string, isSuccess: boolean) {
     return await this.logRepository.create(
@@ -11,19 +10,17 @@ export class LogService {
     );
   }
 
-  async recordForgotPassword(userId: string, tx: Prisma.TransactionClient) {
+  async recordForgotPassword(userId: string) {
     return await this.logRepository.create(
       userId,
       "User requested password reset",
-      tx,
     );
   }
 
-  async recordPasswordReset(userId: string, tx?: Prisma.TransactionClient) {
+  async recordPasswordReset(userId: string) {
     return await this.logRepository.create(
       userId,
       "User reset password successfully",
-      tx,
     );
   }
 }

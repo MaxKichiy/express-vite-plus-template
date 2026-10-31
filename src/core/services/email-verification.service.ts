@@ -1,65 +1,46 @@
 import { randomUUID } from "node:crypto";
-
-import { BadRequest, InternalServerError } from "http-errors";
-
 import * as Sentry from "@sentry/node";
 
-import { errors } from "../../constants/error.constant";
-import { Prisma } from "../../generated/prisma/client";
-import { EmailVerificationRepository } from "../../repositories/email-verification.repository";
 import { EmailService } from "./email/email.service";
-import { prisma } from "@src/infrastructure/database/prisma";
 import { UserService } from "../users/user.service";
+import { IEmailVerificationRepository } from "../interfaces/IEmailVerification";
+import { AppError } from "../error";
 
 export class EmailVerificationService {
   constructor(
     private readonly emailService: EmailService,
     private readonly users: Pick<UserService, "findByIdOrThrow" | "update">,
+    private readonly emailVerificationRepository: IEmailVerificationRepository,
   ) {}
 
-  private readonly emailVerificationRepository: EmailVerificationRepository =
-    new EmailVerificationRepository();
-
-  async sendEmailVerification(
-    userId: string,
-    newEmail: string,
-    tx?: Prisma.TransactionClient,
-  ) {
+  async sendEmailVerification(userId: string, newEmail: string) {
     const token = randomUUID();
 
     try {
       await this.emailService.sendVerificationEmail(newEmail, token);
     } catch (err) {
       Sentry.captureException(err);
-      throw new InternalServerError(errors.EMAIL_NOT_SENT);
+      throw new AppError("EMAIL_NOT_SENT");
     }
 
-    return await this.emailVerificationRepository.create(userId, token, tx);
+    return await this.emailVerificationRepository.create(userId, token);
   }
 
-  async validateEmailVerification(
-    userId: string,
-    verificationToken: string,
-    tx: Prisma.TransactionClient = prisma,
-  ) {
+  async validateEmailVerification(userId: string, verificationToken: string) {
     const validCode = await this.emailVerificationRepository.findValidForUser(
       userId,
       verificationToken,
     );
 
     if (!validCode) {
-      throw new BadRequest(errors.INVALID_DATA);
+      throw new AppError("INVALID_DATA");
     }
 
-    await this.emailVerificationRepository.expireForUser(userId, tx);
+    await this.emailVerificationRepository.expireForUser(userId);
   }
 
-  async resendEmailVerification(
-    userId: string,
-    email: string,
-    tx?: Prisma.TransactionClient,
-  ) {
-    await this.emailVerificationRepository.expireForUser(userId, tx);
+  async resendEmailVerification(userId: string, email: string) {
+    await this.emailVerificationRepository.expireForUser(userId);
     return await this.sendEmailVerification(userId, email);
   }
 
