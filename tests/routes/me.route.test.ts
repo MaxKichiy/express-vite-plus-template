@@ -8,7 +8,7 @@ const mockTokenGuard = vi.fn((req: any, _res: any, next: any) => {
 import express from "express";
 import request from "supertest";
 
-import { MeRouter } from "../../src/routes/me.route";
+import { MeRouter } from "../../src/http/routes/me.routeroute";
 import { mockAccessToken } from "../mocks/tokens.mock";
 import { mockUnverifiedUser, mockUser } from "../mocks/user.mock";
 
@@ -302,7 +302,10 @@ describe("Me Routes", () => {
       });
 
       const promises = Array.from({ length: 3 }, () =>
-        request(app).get("/api/me").set("Authorization", `Bearer ${mockAccessToken}`).expect(200),
+        request(app)
+          .get("/api/me")
+          .set("Authorization", `Bearer ${mockAccessToken}`)
+          .expect(200),
       );
 
       const responses = await Promise.all(promises);

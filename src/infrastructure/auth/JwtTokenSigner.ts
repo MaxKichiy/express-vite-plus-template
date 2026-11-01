@@ -1,4 +1,4 @@
-import { errors } from "@src/constants/error.constant";
+import { errors } from "@src/config/constants/error.constant";
 import { ITokenSigner } from "@src/core/interfaces/ITokenSigner";
 import jwt from "jsonwebtoken";
 

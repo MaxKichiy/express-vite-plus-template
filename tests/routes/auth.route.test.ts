@@ -8,12 +8,14 @@ const mockAuthControllerRefreshToken = vi.fn();
 const mockAuthControllerForgotPassword = vi.fn();
 const mockAuthControllerResetPassword = vi.fn();
 const mockTokenGuard = vi.fn((_req: any, _res: any, next: any) => next());
-const mockTokenGuardWithEmailVerification = vi.fn((_req: any, _res: any, next: any) => next());
+const mockTokenGuardWithEmailVerification = vi.fn(
+  (_req: any, _res: any, next: any) => next(),
+);
 
 import express from "express";
 import request from "supertest";
 
-import { AuthRouter } from "../../src/routes/auth.route";
+import { AuthRouter } from "../../src/http/routes/auth.routeroute";
 import {
   mockAccessToken,
   mockEmailVerificationToken,
@@ -70,10 +72,12 @@ describe("Auth Routes", () => {
       next();
     });
 
-    mockTokenGuardWithEmailVerification.mockImplementation((req: any, _res: any, next: any) => {
-      req.user = mockUser;
-      next();
-    });
+    mockTokenGuardWithEmailVerification.mockImplementation(
+      (req: any, _res: any, next: any) => {
+        req.user = mockUser;
+        next();
+      },
+    );
   });
 
   describe("POST /api/auth/login", () => {
@@ -317,10 +321,14 @@ describe("Auth Routes", () => {
 
     it("should handle resend verification without authorization", async () => {
       mockTokenGuard.mockImplementationOnce((_req, res, _next) => {
-        res.status(401).json({ success: false, error: "NO_ACCESS_TOKEN_PROVIDED" });
+        res
+          .status(401)
+          .json({ success: false, error: "NO_ACCESS_TOKEN_PROVIDED" });
       });
 
-      const response = await request(app).post("/api/auth/resend-verification").expect(401);
+      const response = await request(app)
+        .post("/api/auth/resend-verification")
+        .expect(401);
 
       expect(response.body.success).toBe(false);
       expect(response.body.error).toBe("NO_ACCESS_TOKEN_PROVIDED");
@@ -352,7 +360,9 @@ describe("Auth Routes", () => {
         res.status(401).json({ success: false, error: "UNAUTHORIZED" });
       });
 
-      const response = await request(app).post("/api/auth/refresh-token").expect(401);
+      const response = await request(app)
+        .post("/api/auth/refresh-token")
+        .expect(401);
 
       expect(response.body.success).toBe(false);
       expect(response.body.error).toBe("UNAUTHORIZED");

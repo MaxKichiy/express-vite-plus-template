@@ -1,4 +1,3 @@
-import { errors } from "../../constants/error.constant";
 import { TokenService } from "./token.service";
 import { UserService } from "../users/user.service";
 import { EmailService } from "@src/core/services/email/email.service";
@@ -16,7 +15,7 @@ export interface SignUpInput {
   lastName: string;
   email: string;
   password: string;
-  phoneNumber: string;
+  phoneNumber?: string;
 }
 
 export class AuthService {
@@ -33,7 +32,7 @@ export class AuthService {
   ) {}
 
   async login(email: string, password: string) {
-    const user = await this.userService.findByEmailWithPassword(email);
+    const user = await this.userService.findByEmail(email);
 
     if (!user) {
       throw new AppError("INVALID_CREDENTIALS");
@@ -171,7 +170,7 @@ export class AuthService {
 
   async refreshToken(refreshToken: string | undefined) {
     if (!refreshToken) {
-      throw new AppError(errors.UNAUTHORIZED);
+      throw new AppError("UNAUTHORIZED");
     }
 
     const user = await this.tokenService.verifyRefreshToken(refreshToken);

@@ -15,7 +15,7 @@ import {
   ipLimiter,
   limiterFactory,
   userLimiter,
-} from "../../src/middlewares/limiter.middleware";
+} from "../../src/http/middlewares/limiter.middleware";
 import { TokenService } from "../../src/core/services/token.service";
 import { mockNext, mockRequest, mockResponse } from "../mocks/request.mock";
 import { mockAccessToken } from "../mocks/tokens.mock";

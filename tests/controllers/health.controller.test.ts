@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vite-plus/test";
-import { HealthController } from "../../src/controllers/health.controller";
+import { HealthController } from "../../src/http/controllers/health.controlleroller";
 import { HealthService } from "../../src/core/services/health.service";
 import { mockRequest, mockResponse } from "../mocks/request.mock";
 
