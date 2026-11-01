@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vite-plus/test";
 import { Forbidden } from "http-errors";
 
 import { UserRole } from "../../src/generated/prisma/client";
-import { roleGuard } from "../../src/middlewares/role.guard";
+import { roleGuard } from "../../src/http/middlewares/role.guard";
 import { mockNext, mockRequest, mockResponse } from "../mocks/request.mock";
 import { mockAdminUser, mockUser } from "../mocks/user.mock";
 

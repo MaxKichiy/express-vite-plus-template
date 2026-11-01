@@ -1,5 +1,5 @@
+import { env } from "@src/config/env";
 import { IGoogleVerifier } from "@src/core/interfaces/IGoogleVerifier";
-import { env } from "@src/env";
 import { OAuth2Client } from "google-auth-library";
 
 export class GoogleProvider {

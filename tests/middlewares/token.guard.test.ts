@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vite-plus/test";
 import { Unauthorized } from "http-errors";
 
-import { TokenGuard } from "../../src/middlewares/token.guard";
+import { TokenGuard } from "../../src/http/middlewares/token.guardguard";
 import { TokenService } from "../../src/core/services/token.service";
 import { mockNext, mockRequest, mockResponse } from "../mocks/request.mock";
 import { mockAccessToken } from "../mocks/tokens.mock";

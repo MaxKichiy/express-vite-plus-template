@@ -1,4 +1,4 @@
-import { errors } from "@src/constants/error.constant";
+import { errors } from "@src/config/constants/error.constant";
 
 export type ErrorCode = keyof typeof errors;
 

@@ -10,21 +10,19 @@ export type GoogleUser = {
   updatedAt: Date;
 };
 
-type NewUser = {
-  id?: string;
-  googleAccountId: string;
-  userId?: string;
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  emailVerified?: boolean;
-  createdAt?: Date | string;
-  updatedAt?: Date | string;
-};
+export type NewGoogleUser = Pick<
+  GoogleUser,
+  "userId" | "googleAccountId" | "firstName" | "lastName" | "email"
+> &
+  Partial<Pick<GoogleUser, "emailVerified">>;
+
+export type GoogleUserUpdate = Partial<
+  Omit<GoogleUser, "id" | "userId" | "createdAt" | "updatedAt">
+>;
 
 export interface IGoogleUserRepository {
   findOneByEmail(email: string): Promise<GoogleUser | null>;
   findGoogleUserByUserId(userId: string): Promise<GoogleUser | null>;
-  create(googleUser: NewUser): Promise<GoogleUser>;
-  update(id: string, data: NewUser): Promise<GoogleUser>;
+  create(googleUser: NewGoogleUser): Promise<GoogleUser>;
+  update(id: string, data: GoogleUserUpdate): Promise<GoogleUser>;
 }

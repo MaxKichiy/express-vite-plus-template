@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vite-plus/test";
-import { AuthController } from "../../src/controllers/auth.controller";
+import { AuthController } from "../../src/http/controllers/auth.controlleroller";
 import { AuthService } from "../../src/core/services/auth.service";
 import { mockRequest, mockResponse } from "../mocks/request.mock";
 import {

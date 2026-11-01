@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vite-plus/test";
 import express from "express";
 import request from "supertest";
 
-import { SentryRouter } from "../../src/routes/sentry.route";
+import { SentryRouter } from "../../src/http/routes/sentry.routeroute";
 
 describe("Sentry Routes", () => {
   let app: express.Application;
@@ -31,7 +31,9 @@ describe("Sentry Routes", () => {
         next();
       });
 
-      const response = await request(testApp).get("/api/sentry/debug").expect(500);
+      const response = await request(testApp)
+        .get("/api/sentry/debug")
+        .expect(500);
 
       expect(response.body.error).toBe("My first Sentry error!");
     });

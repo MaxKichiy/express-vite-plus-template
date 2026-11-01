@@ -1,10 +1,10 @@
-import { env } from "@src/env";
 import {
   resetPasswordEmail,
   verificationEmail,
 } from "@src/core/services/email/email-templates";
 import { IEmailProvider } from "../../interfaces/IEmailProvider";
 import { PasswordReset } from "@src/core/interfaces/IPasswordResetsRepository";
+import { env } from "@src/config/env";
 
 export class EmailService {
   constructor(private readonly mailer: IEmailProvider) {}

@@ -1,4 +1,3 @@
-import { errors } from "../../constants/error.constant";
 import { AppError } from "../error";
 import { IUserRepository } from "./IUserRepository";
 import { NewUser, UserChanges } from "./user";
@@ -26,10 +25,6 @@ export class UserService {
     }
 
     return user;
-  }
-
-  async findByEmailWithPassword(email: string) {
-    return await this.userRepository.findByEmailWithPassword(email);
   }
 
   async findById(userId: string) {

@@ -19,6 +19,29 @@ export default defineConfig({
       "no-duplicate-imports": ["error", { includeExports: true }],
       "no-empty": ["error", { allowEmptyCatch: true }],
     },
+    overrides: [
+      {
+        files: ["src/core/**/*", "**/src/core/**/*"],
+        rules: {
+          "no-restricted-imports": [
+            "error",
+            {
+              patterns: [
+                {
+                  group: ["../**"],
+                  message: "Core moudle are restricted from importing outside",
+                },
+                {
+                  regex: "^(src|@|\\.|~)(?!/core).*$",
+                  message:
+                    "Core is isolated and cannot depend on external application layers.",
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ],
   },
   test: {
     include: ["tests/**/*.test.ts"],

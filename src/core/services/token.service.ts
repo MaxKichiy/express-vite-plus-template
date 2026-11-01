@@ -1,17 +1,14 @@
-import { Unauthorized } from "http-errors";
-
-import { errors } from "../../constants/error.constant";
-import { UserRole } from "../../generated/prisma/client";
 import { ITokenSigner } from "../interfaces/ITokenSigner";
 import z from "zod";
-import { User } from "../users/user";
+import { User, UserRole } from "../users/user";
 import { UserService } from "../users/user.service";
+import { AppError } from "../error";
 
 const AccessClaims = z.object({
   type: z.literal("access"),
   id: z.string(),
   emailVerified: z.boolean(),
-  role: z.enum(UserRole),
+  role: z.enum(["ADMIN", "USER"] as const satisfies readonly UserRole[]),
 });
 const RefreshClaims = z.object({ type: z.literal("refresh"), id: z.string() });
 
@@ -51,13 +48,13 @@ export class TokenService {
   ): Promise<User> {
     const claims = schema.safeParse(await this.signer.verify(token));
     if (!claims.success) {
-      throw new Unauthorized(errors.INVALID_TOKEN);
+      throw new AppError("INVALID_TOKEN");
     }
 
     try {
       return await this.userService.findByIdOrThrow(claims.data.id);
     } catch {
-      throw new Unauthorized(errors.UNAUTHORIZED);
+      throw new AppError("UNAUTHORIZED");
     }
   }
 }

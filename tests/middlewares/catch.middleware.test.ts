@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vite-plus/test";
-import { catchHandler } from "../../src/middlewares/catch.middleware";
+import { catchHandler } from "../../src/http/middlewares/catch.middlewareeware";
 import { mockNext, mockRequest, mockResponse } from "../mocks/request.mock";
 
 describe("catchHandler", () => {

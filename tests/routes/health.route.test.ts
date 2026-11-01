@@ -5,7 +5,7 @@ const mockHealthControllerReady = vi.fn();
 import express from "express";
 import request from "supertest";
 
-import { HealthRouter } from "../../src/routes/health.route";
+import { HealthRouter } from "../../src/http/routes/health.routeroute";
 
 vi.mock("../../src/middlewares/limiter.middleware", () => ({
   ipLimiter: vi.fn(() => (_req: any, _res: any, next: any) => next()),
@@ -124,7 +124,9 @@ describe("Health Routes", () => {
         });
       });
 
-      const promises = Array.from({ length: 5 }, () => request(app).get("/api/health").expect(200));
+      const promises = Array.from({ length: 5 }, () =>
+        request(app).get("/api/health").expect(200),
+      );
 
       const responses = await Promise.all(promises);
 
@@ -185,7 +187,10 @@ describe("Health Routes", () => {
         res.status(200).json({ success: true });
       });
 
-      const response = await request(app).get("/api/ready").send({}).expect(200);
+      const response = await request(app)
+        .get("/api/ready")
+        .send({})
+        .expect(200);
 
       expect(response.body).toEqual({ success: true });
       expect(mockHealthControllerReady).toHaveBeenCalledTimes(1);
@@ -206,7 +211,9 @@ describe("Health Routes", () => {
         res.status(200).json({ success: true });
       });
 
-      const promises = Array.from({ length: 3 }, () => request(app).get("/api/ready").expect(200));
+      const promises = Array.from({ length: 3 }, () =>
+        request(app).get("/api/ready").expect(200),
+      );
 
       const responses = await Promise.all(promises);
 

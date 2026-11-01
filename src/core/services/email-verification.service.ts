@@ -1,5 +1,4 @@
 import { randomUUID } from "node:crypto";
-import * as Sentry from "@sentry/node";
 
 import { EmailService } from "./email/email.service";
 import { UserService } from "../users/user.service";
@@ -19,8 +18,7 @@ export class EmailVerificationService {
     try {
       await this.emailService.sendVerificationEmail(newEmail, token);
     } catch (err) {
-      Sentry.captureException(err);
-      throw new AppError("EMAIL_NOT_SENT");
+      throw new AppError("EMAIL_NOT_SENT", { cause: err });
     }
 
     return await this.emailVerificationRepository.create(userId, token);
