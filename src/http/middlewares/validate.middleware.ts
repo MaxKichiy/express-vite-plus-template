@@ -1,4 +1,4 @@
-import { errors } from "@src/config/constants/error.constant";
+import { ErrorCode } from "#src/core/error";
 import { NextFunction, Request, Response } from "express";
 import { z } from "zod";
 
@@ -20,13 +20,11 @@ export function validate(schema: z.ZodType<ValidateSchemaType>) {
         message: issue.message,
       }));
 
-      res
-        .status(400)
-        .json({
-          success: false,
-          error: errors.INVALID_DATA,
-          details: errorMessages,
-        });
+      res.status(400).json({
+        success: false,
+        error: "INVALID_DATA" satisfies ErrorCode,
+        details: errorMessages,
+      });
       return;
     }
 

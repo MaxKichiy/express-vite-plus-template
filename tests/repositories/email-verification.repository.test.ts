@@ -16,7 +16,7 @@ import {
   mockNonExistentEmailVerificationId,
 } from "../mocks/entities.mock";
 import { mockUser } from "../mocks/user.mock";
-import { prisma } from "@src/infrastructure/database/prisma";
+import { prisma } from "#src/infrastructure/database/prisma";
 
 describe("EmailVerificationRepository", () => {
   let repository: EmailVerificationRepository;

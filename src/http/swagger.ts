@@ -2,7 +2,7 @@ import {
   OpenAPIRegistry,
   OpenApiGeneratorV3,
 } from "@asteasolutions/zod-to-openapi";
-import { env } from "@src/config/env";
+import { env } from "#src/config/env";
 import { Express } from "express";
 import basicAuth from "express-basic-auth";
 import swaggerUi from "swagger-ui-express";

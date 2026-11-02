@@ -14,8 +14,8 @@ import { LoginRequest } from "../validators/login.validator";
 import { ResetPasswordRequest } from "../validators/reset-password.validator";
 import { SignUpRequest } from "../validators/sign-up.validator";
 import { VerifyEmailRequest } from "../validators/verify-email.validator";
-import { AuthService } from "@src/core/services/auth.service";
-import { User } from "@src/core/users/user";
+import { AuthService } from "#src/core/services/auth.service";
+import { User } from "#src/core/users/user";
 
 export class AuthController {
   constructor(private readonly authService: AuthService) {}

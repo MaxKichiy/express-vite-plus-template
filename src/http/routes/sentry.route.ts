@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 import { registry } from "../swagger";
-import { errors } from "@src/config/constants/error.constant";
+import { ErrorCode } from "#src/core/error";
 
 export const SentryRouter = Router();
 
@@ -16,7 +16,7 @@ registry.registerPath({
   tags: ["Sentry"],
   responses: {
     500: {
-      description: errors.INTERNAL_SERVER_ERROR,
+      description: "INTERNAL_SERVER_ERROR" satisfies ErrorCode,
     },
   },
 });

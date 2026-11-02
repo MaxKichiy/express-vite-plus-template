@@ -1,4 +1,4 @@
-interface Log {
+export interface Log {
   id: string;
   userId: string;
   message: string;

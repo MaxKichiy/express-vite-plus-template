@@ -25,7 +25,10 @@ const envSchema = z.object({
   GOOGLE_OAUTH_CLIENT_ID: z.string(),
   GOOGLE_OAUTH_CLIENT_SECRET: z.string(),
   JWT_SECRET_KEY: z.string(),
-  NODE_ENV: z.enum(["development", "production", "test"]).optional().default("development"),
+  NODE_ENV: z
+    .enum(["development", "production", "test"])
+    .optional()
+    .default("development"),
   PASSWORD_RESET_EXPIRE: z.coerce
     .number()
     .optional()
@@ -36,7 +39,14 @@ const envSchema = z.object({
     .optional()
     .default(1000 * 60 * 60 * 24 * 90),
   SENTRY_DSN: z.string().optional(),
-  SENTRY_ENV: z.enum(["development", "production", "staging"]).optional().default("development"),
+  SENTRY_ENV: z
+    .enum(["development", "production", "staging"])
+    .optional()
+    .default("development"),
 });
 
+export function parseEnv(source: Record<string, string | undefined>) {
+  return envSchema.parse(source);
+}
+export type Env = ReturnType<typeof parseEnv>;
 export const env = envSchema.parse(process.env);

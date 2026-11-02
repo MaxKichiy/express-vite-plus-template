@@ -1,7 +1,7 @@
 import { TokenService } from "./token.service";
 import { UserService } from "../users/user.service";
-import { EmailService } from "@src/core/services/email/email.service";
-import { EmailVerificationService } from "@src/core/services/email-verification.service";
+import { EmailService } from "#src/core/services/email/email.service";
+import { EmailVerificationService } from "#src/core/services/email-verification.service";
 import { AppError } from "../error";
 import { IPasswordResetsRepository } from "../interfaces/IPasswordResetsRepository";
 import { LogService } from "./log.service";
@@ -38,9 +38,11 @@ export class AuthService {
       throw new AppError("INVALID_CREDENTIALS");
     }
 
+    if (!user?.passwordHash) throw new AppError("INVALID_CREDENTIALS");
+
     const isPasswordValid = await this.passwordEncryptionService.compare(
       password,
-      user.passwordHash!,
+      user.passwordHash,
     );
     await this.logService.recordLoginAttempt(user.id, isPasswordValid);
 
@@ -187,7 +189,7 @@ export class AuthService {
         const r = await passwordResets.create(user.id);
         await new LogService(logs).recordForgotPassword(user.id);
 
-        return r;
+        return r.token;
       },
     );
 

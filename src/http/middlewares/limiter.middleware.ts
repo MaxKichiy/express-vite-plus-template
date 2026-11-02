@@ -1,4 +1,4 @@
-import { AppError } from "@src/core/error";
+import { AppError } from "#src/core/error";
 import { NextFunction, Request, Response } from "express";
 import rateLimit, {
   ipKeyGenerator,

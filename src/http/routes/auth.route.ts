@@ -23,7 +23,7 @@ import { LoginSchema } from "../validators/login.validator";
 import { ResetPasswordSchema } from "../validators/reset-password.validator";
 import { SignUpSchema } from "../validators/sign-up.validator";
 import { VerifyEmailSchema } from "../validators/verify-email.validator";
-import { time } from "@src/config/constants/time.constant";
+import { time } from "#src/config/constants/time.constant";
 
 export function createAuthRouter(
   authController: AuthController,

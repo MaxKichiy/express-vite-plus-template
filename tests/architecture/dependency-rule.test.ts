@@ -5,7 +5,7 @@ import { describe, it, expect } from "vite-plus/test";
 const CORE = path.resolve(__dirname, "../../src/core");
 
 const FORBIDDEN = [
-  /@src\/(infrastructure|http|main|config)\//,
+  /[@#]src\/(infrastructure|http|main|config)\//,
   /\.\.\/(infrastructure|http|main|config)\//,
   /^express$/,
   /^http-errors$/,

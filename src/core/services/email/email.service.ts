@@ -1,19 +1,20 @@
 import {
   resetPasswordEmail,
   verificationEmail,
-} from "@src/core/services/email/email-templates";
+} from "#src/core/services/email/email-templates";
 import { IEmailProvider } from "../../interfaces/IEmailProvider";
-import { PasswordReset } from "@src/core/interfaces/IPasswordResetsRepository";
-import { env } from "@src/config/env";
 
 export class EmailService {
-  constructor(private readonly mailer: IEmailProvider) {}
+  constructor(
+    private readonly mailer: IEmailProvider,
+    private readonly appUrl: string,
+  ) {}
 
   async sendResetPasswordEmail(
     receiverEmail: string,
-    passwordResetToken: PasswordReset,
+    passwordResetToken: string,
   ) {
-    const passwordResetUrl = `${env.APP_URL}/password-reset?token=${passwordResetToken}`;
+    const passwordResetUrl = `${this.appUrl}/password-reset?token=${passwordResetToken}`;
     const { to, subject, body } = resetPasswordEmail(
       receiverEmail,
       passwordResetUrl,
@@ -26,7 +27,7 @@ export class EmailService {
     receiverEmail: string,
     verificationToken: string,
   ) {
-    const verificationUrl = `${env.APP_URL}/verification?token=${verificationToken}`;
+    const verificationUrl = `${this.appUrl}/verification?token=${verificationToken}`;
     const { to, subject, body } = verificationEmail(
       receiverEmail,
       verificationUrl,

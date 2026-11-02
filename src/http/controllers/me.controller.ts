@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
 import { toMeResponseDto } from "../dtos/me-response.dto";
-import { User } from "@src/core/users/user";
+import { User } from "#src/core/users/user";
 
 export class MeController {
   getMe(req: Request, res: Response) {

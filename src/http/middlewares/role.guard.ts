@@ -1,5 +1,5 @@
-import { AppError } from "@src/core/error";
-import { UserRole } from "@src/core/users/user";
+import { AppError } from "#src/core/error";
+import { UserRole } from "#src/core/users/user";
 import { NextFunction, Request, Response } from "express";
 
 export const roleGuard = (allowedRoles: UserRole[]) => {

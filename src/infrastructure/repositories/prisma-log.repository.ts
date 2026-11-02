@@ -1,5 +1,5 @@
-import { ILogRepository } from "@src/core/interfaces/ILogRepository";
-import { Prisma } from "@src/generated/prisma/client";
+import { ILogRepository } from "#src/core/interfaces/ILogRepository";
+import { Prisma } from "#src/generated/prisma/client";
 
 export class PrismaLogRepository implements ILogRepository {
   constructor(private readonly db: Prisma.TransactionClient) {}

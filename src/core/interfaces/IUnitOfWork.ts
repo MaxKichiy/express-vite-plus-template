@@ -12,7 +12,7 @@ export interface TransactionalRepositories {
   googleUsers: IGoogleUserRepository;
 }
 
-export interface IUnitOfWork extends TransactionalRepositories {
+export interface IUnitOfWork {
   runInTransaction<T>(
     work: (transactionalRepos: TransactionalRepositories) => Promise<T>,
   ): Promise<T>;

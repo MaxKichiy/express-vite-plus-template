@@ -2,6 +2,9 @@
   "name": "bee-techy-backend-template",
   "version": "1.0.0",
   "private": true,
+  "imports": {
+    "#src/*": "./build/src/*.js"
+  },
   "description": "Bee Techy backend template",
   "author": "Bee Techy <contact@beetechy.com>",
   "scripts": {
@@ -11,7 +14,7 @@
     "db:migrate": "prisma migrate deploy",
     "db:reset": "prisma migrate reset",
     "db:studio": "prisma studio",
-    "dev": "vpx watch src/index.ts --clear-screen=false",
+    "dev": "vpx watch src/main/index.ts --clear-screen=false",
     "format": "vp fmt",
     "lint": "vp lint",
     "prepare": "husky",
@@ -19,8 +22,10 @@
     "sentry:sourcemaps": "npm run sentry:sourcemaps:inject && npm run sentry:sourcemaps:upload",
     "sentry:sourcemaps:inject": "sentry-cli sourcemaps inject ./build",
     "sentry:sourcemaps:upload": "sentry-cli sourcemaps upload ./build",
-    "start": "node build/src/index.js",
-    "typecheck": "tsc --noEmit"
+    "start": "node build/src/main/index.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vp test run --exclude 'tests/integration/**'",
+    "test:integration": "DATABASE_URL=postgresql://postgres:test@localhost:5433/app_test prisma migrate deploy && vp test run tests/integration --no-file-parallelism"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^9.1.0",

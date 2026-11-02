@@ -6,7 +6,7 @@ import { SuccessResponseSchema } from "../dtos/success-response.dto";
 import { catchHandler } from "../middlewares/catch.middleware";
 import { ipLimiter } from "../middlewares/limiter.middleware";
 import { registry } from "../swagger";
-import { time } from "@src/config/constants/time.constant";
+import { time } from "#src/config/constants/time.constant";
 
 export function createHealthRouter(healthController: HealthController): Router {
   const healthRouter = Router();

@@ -6,7 +6,7 @@ import cors from "cors";
 import express, { Express, Router } from "express";
 
 import { setupSwagger } from "./swagger";
-import { env } from "@src/config/env";
+import { env } from "#src/config/env";
 import { errorMiddleware } from "./middlewares/error.middleware";
 
 export function createApp(mainRouter: Router): Express {
