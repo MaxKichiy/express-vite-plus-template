@@ -1,4 +1,4 @@
-import { UserRole } from "@src/core/users/user";
+import { UserRole } from "#src/core/users/user";
 import { z } from "zod";
 
 export const TokenPayloadSchema = z.object({

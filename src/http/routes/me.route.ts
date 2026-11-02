@@ -6,7 +6,7 @@ import { catchHandler } from "../middlewares/catch.middleware";
 import { createUserLimiter } from "../middlewares/limiter.middleware";
 import { TokenGuard } from "../middlewares/token.guard";
 import { bearerAuth, registry } from "../swagger";
-import { time } from "@src/config/constants/time.constant";
+import { time } from "#src/config/constants/time.constant";
 
 export function createMeRouter(
   meController: MeController,

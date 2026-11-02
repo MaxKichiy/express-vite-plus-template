@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/node";
 import { nodeProfilingIntegration } from "@sentry/profiling-node";
-import { env } from "@src/config/env";
+import { env } from "#src/config/env";
 
 if (env.SENTRY_DSN) {
   const options: Sentry.NodeOptions = {

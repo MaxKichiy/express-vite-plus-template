@@ -1,5 +1,5 @@
-import { IUserRepository } from "@src/core/users/IUserRepository";
-import { Prisma, User } from "@src/generated/prisma/client";
+import { IUserRepository } from "#src/core/users/IUserRepository";
+import { Prisma, User } from "#src/generated/prisma/client";
 
 export class PrismaUserRepository implements IUserRepository {
   constructor(private readonly db: Prisma.TransactionClient) {}

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { toSuccessResponseDto } from "./success-response.dto";
-import { successMessage } from "@src/config/constants/success.constant";
+import { successMessage } from "#src/config/constants/success.constant";
 
 export const ForgotPasswordResponseSchema = z
   .object({

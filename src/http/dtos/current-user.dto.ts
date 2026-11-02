@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { sharedDto } from "./shared";
-import { User } from "@src/core/users/user";
+import { User } from "#src/core/users/user";
 
 export const CurrentUserSchema = z
   .object({

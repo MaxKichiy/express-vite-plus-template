@@ -3,8 +3,8 @@ import {
   GoogleUserUpdate,
   IGoogleUserRepository,
   NewGoogleUser,
-} from "@src/core/interfaces/IGoogleUserRepository";
-import { Prisma } from "@src/generated/prisma/client";
+} from "#src/core/interfaces/IGoogleUserRepository";
+import { Prisma } from "#src/generated/prisma/client";
 
 export class PrismaGoogleUserRepository implements IGoogleUserRepository {
   constructor(private readonly db: Prisma.TransactionClient) {}

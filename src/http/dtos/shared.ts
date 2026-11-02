@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { UserRole } from "@src/core/users/user";
+import { UserRole } from "#src/core/users/user";
 
 export const sharedDto = {
   id: z.string().meta({

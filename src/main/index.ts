@@ -1,10 +1,10 @@
 import "./instrument";
 import * as http from "node:http";
 
-import { prisma } from "@src/infrastructure/database/prisma";
-import { createMainRouter } from "@src/http/routes";
-import { createApp } from "@src/http/app";
-import { env } from "@src/config/env";
+import { prisma } from "#src/infrastructure/database/prisma";
+import { createMainRouter } from "#src/http/routes/index";
+import { createApp } from "#src/http/app";
+import { env } from "#src/config/env";
 import { bootstrapRepositories } from "./repositories.container";
 import { bootstrapServices } from "./services.container";
 

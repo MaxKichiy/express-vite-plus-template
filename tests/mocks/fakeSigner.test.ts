@@ -1,8 +1,8 @@
 import { expect, it } from "vite-plus/test";
 
-import { ITokenSigner } from "@src/core/interfaces/ITokenSigner";
-import { TokenService } from "@src/core/services/token.service";
-import { User } from "@src/generated/prisma/client";
+import { ITokenSigner } from "#src/core/interfaces/ITokenSigner";
+import { TokenService } from "#src/core/services/token.service";
+import { User } from "#src/generated/prisma/client";
 
 export const fakeSigner: ITokenSigner = {
   sign: async (claims) => JSON.stringify(claims),

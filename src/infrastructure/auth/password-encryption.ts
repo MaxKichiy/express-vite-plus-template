@@ -1,4 +1,4 @@
-import { IPasswordEncryption } from "@src/core/interfaces/IPasswordEncryption";
+import { IPasswordEncryption } from "#src/core/interfaces/IPasswordEncryption";
 import bcryptjs from "bcryptjs";
 
 export class PasswordEncryption implements IPasswordEncryption {

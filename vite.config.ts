@@ -5,7 +5,7 @@ import { defineConfig } from "vite-plus";
 export default defineConfig({
   resolve: {
     alias: {
-      "@src": path.resolve(__dirname, "src"),
+      "#src": path.resolve(__dirname, "src"),
     },
   },
   lint: {
@@ -32,7 +32,7 @@ export default defineConfig({
                   message: "Core moudle are restricted from importing outside",
                 },
                 {
-                  regex: "^(src|@|\\.|~)(?!/core).*$",
+                  regex: "^(src|@|#|\\.|~)(?!/core).*$",
                   message:
                     "Core is isolated and cannot depend on external application layers.",
                 },
@@ -45,7 +45,6 @@ export default defineConfig({
   },
   test: {
     include: ["tests/**/*.test.ts"],
-    setupFiles: ["dotenv/config"],
     environment: "node",
     env: {
       APP_URL: "http://localhost:3000",

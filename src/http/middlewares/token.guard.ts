@@ -1,5 +1,5 @@
-import { AppError } from "@src/core/error";
-import { TokenService } from "@src/core/services/token.service";
+import { AppError } from "#src/core/error";
+import { TokenService } from "#src/core/services/token.service";
 import { NextFunction, Request, Response } from "express";
 
 export class TokenGuard {

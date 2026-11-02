@@ -1,7 +1,7 @@
-import { ITokenSigner } from "@src/core/interfaces/ITokenSigner";
-import { JwtTokenSigner } from "@src/infrastructure/providers/JwtTokenSigner";
+import { ITokenSigner } from "#src/core/interfaces/ITokenSigner";
 import { describe, expect, it } from "vite-plus/test";
 import { fakeSigner } from "../mocks/fakeSigner.test";
+import { JwtTokenSigner } from "#src/infrastructure/auth/JwtTokenSigner";
 
 const implementations: [string, ITokenSigner][] = [
   ["JwtTokenSigner", new JwtTokenSigner("secret")],
@@ -12,7 +12,7 @@ describe.each(implementations)(
   "%s keeps the ITokenSigner contract",
   (_name, signer) => {
     it("verify returns exactly what sign was given", async () => {
-      const token = await signer.sign({ type: "refresh", id: "u1" }, 60);
+      const token = await signer.sign({ type: "refresh", id: "u1" }, 60_000);
       expect(await signer.verify(token)).toMatchObject({
         type: "refresh",
         id: "u1",

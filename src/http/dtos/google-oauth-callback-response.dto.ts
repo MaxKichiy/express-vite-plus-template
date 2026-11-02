@@ -3,7 +3,7 @@ import { z } from "zod";
 import { CurrentUserSchema, toCurrentUserDto } from "./current-user.dto";
 import { sharedDto } from "./shared";
 import { toSuccessResponseDto } from "./success-response.dto";
-import { User } from "@src/core/users/user";
+import { User } from "#src/core/users/user";
 
 export const GoogleOAuthCallbackResponseSchema = z
   .object({

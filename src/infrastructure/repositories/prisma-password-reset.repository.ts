@@ -1,6 +1,6 @@
-import { env } from "@src/config/env";
-import { IPasswordResetsRepository } from "@src/core/interfaces/IPasswordResetsRepository";
-import { Prisma } from "@src/generated/prisma/client";
+import { env } from "#src/config/env";
+import { IPasswordResetsRepository } from "#src/core/interfaces/IPasswordResetsRepository";
+import { Prisma } from "#src/generated/prisma/client";
 
 export class PrismaPasswordResetRepository implements IPasswordResetsRepository {
   constructor(private readonly db: Prisma.TransactionClient) {}

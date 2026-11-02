@@ -1,6 +1,6 @@
-import { env } from "@src/config/env";
-import { IEmailVerificationRepository } from "@src/core/interfaces/IEmailVerification";
-import { Prisma } from "@src/generated/prisma/client";
+import { env } from "#src/config/env";
+import { IEmailVerificationRepository } from "#src/core/interfaces/IEmailVerification";
+import { Prisma } from "#src/generated/prisma/client";
 
 export class PrismaEmailVerificationRepository implements IEmailVerificationRepository {
   constructor(private readonly db: Prisma.TransactionClient) {}

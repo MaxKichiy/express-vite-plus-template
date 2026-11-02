@@ -1,10 +1,11 @@
-import { AppError, ErrorCode } from "@src/core/error";
+import { AppError, ErrorCode } from "#src/core/error";
 import { ErrorRequestHandler } from "express";
 import * as Sentry from "@sentry/node";
 
 import { isHttpError } from "http-errors";
 
 const STATUS: Partial<Record<ErrorCode, number>> = {
+  FORBIDDEN: 403,
   INVALID_CREDENTIALS: 401,
   INVALID_DATA: 400,
   INVALID_TOKEN: 401,
@@ -17,7 +18,9 @@ const STATUS: Partial<Record<ErrorCode, number>> = {
 
 export const errorMiddleware: ErrorRequestHandler = (err, _req, res, _next) => {
   if (err instanceof AppError) {
-    return res.status(STATUS[err.code] ?? 500).json({ error: err.code });
+    const status = STATUS[err.code] ?? 500;
+    if (status >= 500) Sentry.captureException(err);
+    return res.status(status).json({ error: err.code });
   }
 
   if (isHttpError(err)) {
