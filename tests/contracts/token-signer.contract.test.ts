@@ -1,6 +1,6 @@
 import { ITokenSigner } from "#src/core/interfaces/ITokenSigner";
 import { describe, expect, it } from "vite-plus/test";
-import { fakeSigner } from "../mocks/fakeSigner.test";
+import { fakeSigner } from "../fakes/fake-signer";
 import { JwtTokenSigner } from "#src/infrastructure/auth/JwtTokenSigner";
 
 const implementations: [string, ITokenSigner][] = [

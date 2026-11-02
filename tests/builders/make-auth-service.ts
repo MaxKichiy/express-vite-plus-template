@@ -4,7 +4,7 @@ import { TokenService } from "#src/core/services/token.service";
 import { UserService } from "#src/core/users/user.service";
 import { InMemoryUserRepository } from "../fakes/in-memory-user.repository";
 import { RecordingMailer } from "../fakes/recording-mailer";
-import { fakeSigner } from "../mocks/fakeSigner.test";
+import { fakeSigner } from "../fakes/fake-signer";
 import { InMemoryLogRepository } from "../fakes/in-memory-log.repository";
 import { User } from "#src/core/users/user";
 import { InMemoryPasswordResetRepository } from "../fakes/in-memory-password-reset.repository";
