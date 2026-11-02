@@ -1,10 +1,8 @@
-import { env } from "#src/config/env";
 import {
   IPasswordResetsRepository,
   PasswordReset,
 } from "#src/core/interfaces/IPasswordResetsRepository";
 import { randomUUID } from "crypto";
-import { read } from "fs";
 
 const ONE_HOUR = 60 * 60 * 1000;
 

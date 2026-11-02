@@ -6,7 +6,7 @@ import { FakeGoogleVerifier } from "../fakes/fake-google-verifier";
 import { fakePasswordEncryption } from "../fakes/fake-password-encryption";
 import { RecordingMailer } from "../fakes/recording-mailer";
 import { inMemoryRepos } from "../helpers/in-memory-repos";
-import { fakeSigner } from "../mocks/fakeSigner.test";
+import { fakeSigner } from "../fakes/fake-signer";
 
 export function testApp(users: User[] = []) {
   const repos = inMemoryRepos(users); // the same 5 in-memory repos + FakeUnitOfWork, as AppRepositories
