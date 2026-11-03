@@ -1,61 +1,51 @@
-import { env } from "#src/config/env";
 import {
   EmailVerification,
   IEmailVerificationRepository,
 } from "#src/core/interfaces/IEmailVerification";
 import { randomUUID } from "crypto";
 
+const ONE_DAY = 24 * 60 * 60 * 1000;
+
 export class InMemoryEmailVerificationRepository implements IEmailVerificationRepository {
-  constructor(private emailVerifications: EmailVerification[] = []) {}
+  private rows: EmailVerification[] = [];
+  constructor(private readonly ttlMs = ONE_DAY) {}
 
   async create(userId: string, token: string) {
     const now = new Date();
-    const newVerification = {
+    const row = {
       id: randomUUID(),
       userId,
       token,
       createdAt: now,
       updatedAt: now,
-      expiresAt: new Date(Date.now() + env.EMAIL_VERIFICATION_EXPIRE),
+      expiresAt: new Date(Date.now() + this.ttlMs),
     };
 
-    this.emailVerifications.push(newVerification);
-    return newVerification;
-  }
-
-  async deleteById(id: string) {
-    const currentVerification = this.emailVerifications.find(
-      (v) => v.id === id,
-    );
-
-    if (!currentVerification) throw new Error("record not found");
-
-    this.emailVerifications = this.emailVerifications.filter(
-      (v) => v.id !== id,
-    );
-
-    return currentVerification;
+    this.rows.push(row);
+    return { ...row };
   }
 
   async expireForUser(userId: string) {
     let count = 0;
-    for (let i = 0; i < this.emailVerifications.length; i++) {
-      if (this.emailVerifications[i]?.userId === userId) {
+    for (let i = 0; i < this.rows.length; i++) {
+      if (this.rows[i]?.userId === userId) {
         count++;
-        this.emailVerifications[i]!.expiresAt = new Date(0);
+        this.rows[i]!.expiresAt = new Date(0);
       }
     }
     return { count };
   }
 
   async findValidForUser(userId: string, token: string) {
-    const currentVerification = this.emailVerifications.find(
+    const currentVerification = this.rows.find(
       (v) =>
         v.userId == userId && v.token === token && v.expiresAt > new Date(),
     );
 
-    if (!currentVerification) throw new Error("record not found");
+    return currentVerification ? { ...currentVerification } : null;
+  }
 
-    return currentVerification;
+  get all(): readonly EmailVerification[] {
+    return { ...this.rows };
   }
 }

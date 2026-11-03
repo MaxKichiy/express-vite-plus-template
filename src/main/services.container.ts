@@ -48,7 +48,6 @@ export function bootstrapServices(
   const healthService = new HealthService();
   const emailVerificationService = new EmailVerificationService(
     emailService,
-    userService,
     repos.emailVerificationRepository,
   );
   const logSerivce = new LogService(repos.logRepository);

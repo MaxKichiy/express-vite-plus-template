@@ -152,7 +152,6 @@ export class AuthService {
       async ({ users, emailVerifications }) => {
         await new EmailVerificationService(
           this.emailService,
-          this.userService,
           emailVerifications,
         ).validateEmailVerification(userId, token);
 
