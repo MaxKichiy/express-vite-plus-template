@@ -1,28 +1,14 @@
 import { randomUUID } from "node:crypto";
 
 import { EmailService } from "./email/email.service";
-import { UserService } from "../users/user.service";
 import { IEmailVerificationRepository } from "../interfaces/IEmailVerification";
 import { AppError } from "../error";
 
 export class EmailVerificationService {
   constructor(
     private readonly emailService: EmailService,
-    private readonly users: Pick<UserService, "findByIdOrThrow" | "update">,
     private readonly emailVerificationRepository: IEmailVerificationRepository,
   ) {}
-
-  async sendEmailVerification(userId: string, newEmail: string) {
-    const token = randomUUID();
-
-    try {
-      await this.emailService.sendVerificationEmail(newEmail, token);
-    } catch (err) {
-      throw new AppError("EMAIL_NOT_SENT", { cause: err });
-    }
-
-    return await this.emailVerificationRepository.create(userId, token);
-  }
 
   async validateEmailVerification(userId: string, verificationToken: string) {
     const validCode = await this.emailVerificationRepository.findValidForUser(
@@ -39,15 +25,14 @@ export class EmailVerificationService {
 
   async resendEmailVerification(userId: string, email: string) {
     await this.emailVerificationRepository.expireForUser(userId);
-    return await this.sendEmailVerification(userId, email);
-  }
 
-  async verifyCode(userId: string, verificationCode: string) {
-    await this.users.findByIdOrThrow(userId);
-    await this.validateEmailVerification(userId, verificationCode);
+    const token = randomUUID();
 
-    return await this.users.update(userId, {
-      emailVerifiedAt: new Date(),
-    });
+    try {
+      await this.emailService.sendVerificationEmail(email, token);
+    } catch (err) {
+      throw new AppError("EMAIL_NOT_SENT", { cause: err });
+    }
+    return await this.emailVerificationRepository.create(userId, token);
   }
 }

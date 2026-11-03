@@ -38,14 +38,10 @@ export function makeAuthService(
 
   const fakeGoogleVerifier = new FakeGoogleVerifier();
 
-  const auth = new AuthService( // same order as the real constructor
+  const auth = new AuthService(
     emailService,
     tokenService,
-    new EmailVerificationService(
-      emailService,
-      userService,
-      repos.emailVerifications,
-    ),
+    new EmailVerificationService(emailService, repos.emailVerifications),
     userService,
     new FakeUnitOfWork(repos),
     new LogService(repos.logs),
