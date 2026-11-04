@@ -1,15 +1,5 @@
-import { env } from "#src/config/env";
 import { IGoogleVerifier } from "#src/core/interfaces/IGoogleVerifier";
 import { OAuth2Client } from "google-auth-library";
-
-export class GoogleProvider {
-  getGoogleClient(): OAuth2Client {
-    return new OAuth2Client(
-      env.GOOGLE_OAUTH_CLIENT_ID,
-      env.GOOGLE_OAUTH_CLIENT_SECRET,
-    );
-  }
-}
 
 export class GoogleVerifier implements IGoogleVerifier {
   constructor(

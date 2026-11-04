@@ -21,4 +21,4 @@ registry.registerPath({
   },
 });
 
-// Remove this file after verifying Sentry is sending issues
+//TODO: Remove this file after verifying Sentry is sending issues

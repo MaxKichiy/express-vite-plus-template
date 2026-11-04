@@ -21,8 +21,6 @@ export type GoogleUserUpdate = Partial<
 >;
 
 export interface IGoogleUserRepository {
-  findOneByEmail(email: string): Promise<GoogleUser | null>;
   findGoogleUserByUserId(userId: string): Promise<GoogleUser | null>;
   create(googleUser: NewGoogleUser): Promise<GoogleUser>;
-  update(id: string, data: GoogleUserUpdate): Promise<GoogleUser>;
 }

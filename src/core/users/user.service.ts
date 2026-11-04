@@ -9,22 +9,8 @@ export class UserService {
     return await this.userRepository.create(user);
   }
 
-  async delete(userId: string) {
-    return await this.userRepository.delete(userId);
-  }
-
   async findByEmail(email: string) {
     return await this.userRepository.findByEmail(email);
-  }
-
-  async findByEmailOrThrow(email: string) {
-    const user = await this.findByEmail(email);
-
-    if (!user) {
-      throw new AppError("USER_NOT_FOUND");
-    }
-
-    return user;
   }
 
   async findById(userId: string) {

@@ -15,25 +15,6 @@ export class TokenGuard {
     }
   };
 
-  authenticateWithEmailVerification = async (
-    req: Request,
-    _res: Response,
-    next: NextFunction,
-  ) => {
-    try {
-      const token = this.extractAuthToken(req);
-      req.user = await this.tokenService.verifyAccessToken(token);
-
-      if (!req.user?.emailVerifiedAt) {
-        throw new AppError("EMAIL_NOT_VERIFIED");
-      }
-
-      next();
-    } catch (err) {
-      next(err);
-    }
-  };
-
   extractAuthToken(req: Request) {
     const token = req.headers.authorization?.replace(/^Bearer /, "");
 
