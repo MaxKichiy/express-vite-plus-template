@@ -27,12 +27,16 @@ export class EmailVerificationService {
     await this.emailVerificationRepository.expireForUser(userId);
 
     const token = randomUUID();
+    const verification = await this.emailVerificationRepository.create(
+      userId,
+      token,
+    );
 
     try {
       await this.emailService.sendVerificationEmail(email, token);
     } catch (err) {
       throw new AppError("EMAIL_NOT_SENT", { cause: err });
     }
-    return await this.emailVerificationRepository.create(userId, token);
+    return verification;
   }
 }
