@@ -1,4 +1,3 @@
-import { AppError } from "#src/core/error";
 import { ITokenSigner } from "#src/core/interfaces/ITokenSigner";
 import jwt from "jsonwebtoken";
 
@@ -16,11 +15,9 @@ export class JwtTokenSigner implements ITokenSigner {
             return reject(new Error(err.message));
           }
 
-          if (!token) {
-            return reject(new AppError("UNABLE_TO_GENERATE_TOKEN"));
+          if (token) {
+            resolve(token);
           }
-
-          resolve(token);
         },
       );
     });

@@ -54,4 +54,7 @@ export class InMemoryUserRepository implements IUserRepository {
   async findById(id: string) {
     return this.users.find((u) => u.id === id) ?? null;
   }
+  get all(): readonly User[] {
+    return [...this.users];
+  }
 }
