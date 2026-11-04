@@ -44,7 +44,6 @@ export default defineConfig({
     ],
   },
   test: {
-    include: ["tests/**/*.test.ts"],
     environment: "node",
     env: {
       APP_URL: "http://localhost:3000",
@@ -57,9 +56,34 @@ export default defineConfig({
       JWT_SECRET_KEY: "test-secret-key",
       NODE_ENV: "test",
     },
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: "unit",
+          include: ["tests/**/*.test.ts"],
+          exclude: ["tests/integration/**"],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: "integration",
+          include: ["tests/integration/**/*.test.ts"],
+          fileParallelism: false,
+        },
+      },
+    ],
     coverage: {
       include: ["src/**/*.ts"],
-      exclude: ["src/generated/**"],
+      provider: "v8",
+      exclude: [
+        "src/generated/**",
+        "src/main/index.ts",
+        "src/main/instrument.ts",
+        "src/infrastructure/database/prisma.ts",
+      ],
+      thresholds: { 100: true },
     },
   },
   fmt: {
