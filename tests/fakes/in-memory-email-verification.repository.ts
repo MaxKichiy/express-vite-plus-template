@@ -46,6 +46,6 @@ export class InMemoryEmailVerificationRepository implements IEmailVerificationRe
   }
 
   get all(): readonly EmailVerification[] {
-    return { ...this.rows };
+    return [...this.rows];
   }
 }

@@ -51,6 +51,6 @@ export class InMemoryPasswordResetRepository implements IPasswordResetsRepositor
   }
 
   get all(): readonly PasswordReset[] {
-    return { ...this.rows };
+    return [...this.rows];
   }
 }

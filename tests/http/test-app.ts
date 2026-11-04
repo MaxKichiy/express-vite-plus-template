@@ -9,13 +9,13 @@ import { inMemoryRepos } from "../helpers/in-memory-repos";
 import { fakeSigner } from "../fakes/fake-signer";
 
 export function testApp(users: User[] = []) {
-  const repos = inMemoryRepos(users); // the same 5 in-memory repos + FakeUnitOfWork, as AppRepositories
+  const repos = inMemoryRepos(users);
   const mailer = new RecordingMailer();
   const services = bootstrapServices(repos, {
-    mailer, // ✅ no AWS
-    signer: fakeSigner, // ✅ readable tokens
-    passwords: fakePasswordEncryption, // ✅ fast (real bcrypt cost 12 is ~250ms per hash)
-    google: new FakeGoogleVerifier(), // ✅ no Google
+    mailer,
+    signer: fakeSigner,
+    passwords: fakePasswordEncryption,
+    google: new FakeGoogleVerifier(),
   });
   return { app: createApp(createMainRouter(services)), mailer, repos }; // ✅ REAL routes, validators, controllers, core
 }
