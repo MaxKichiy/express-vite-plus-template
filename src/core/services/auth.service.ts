@@ -163,9 +163,15 @@ export class AuthService {
     );
   }
 
-  async resendVerification(userId: string, email: string) {
+  async resendVerification(userId: string) {
     const currentUser = await this.userService.findByIdOrThrow(userId);
-    await this.emailVerificationService.resendEmailVerification(userId, email);
+    if (currentUser.emailVerifiedAt) {
+      throw new AppError("INVALID_DATA");
+    }
+    await this.emailVerificationService.resendEmailVerification(
+      userId,
+      currentUser.email,
+    );
     return currentUser;
   }
 
