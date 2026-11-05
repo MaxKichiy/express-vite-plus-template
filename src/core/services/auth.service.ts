@@ -97,7 +97,7 @@ export class AuthService {
 
     const user = await this.uow.runInTransaction(
       async ({ users, googleUsers }) => {
-        const link = await googleUsers.findGoogleUserByUserId(
+        const link = await googleUsers.findByGoogleAccountId(
           identity.googleAccountId,
         );
 
