@@ -50,5 +50,5 @@ export function makeAuthService(
     over.google ?? fakeGoogleVerifier,
   );
 
-  return { auth, repos, mailer };
+  return { auth, repos, mailer, tokenService };
 }

@@ -9,7 +9,7 @@ export function emailVerificationRepositoryContract(
   make: () => Promise<Setup>,
 ) {
   describe(`${name} keeps the IEmailVerificationRepository contract`, () => {
-    it("finds a fresh token for its owner", async () => {
+    it("findValidForUser finds a fresh token for its owner", async () => {
       const { repo, ada } = await make();
       const token = randomUUID();
       await repo.create(ada, token);
@@ -18,7 +18,7 @@ export function emailVerificationRepositoryContract(
         token: token,
       });
     });
-    it("returns null (never throws) for an unknown token", async () => {
+    it("findValidForUser returns null (never throws) for an unknown token", async () => {
       const { repo, ada, bob } = await make();
       const token = randomUUID();
       await repo.create(ada, token);

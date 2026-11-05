@@ -66,10 +66,7 @@ export class AuthController {
 
   async resendVerification(req: Request, res: Response) {
     const user = req.user as User;
-    const currentUser = await this.authService.resendVerification(
-      user.id,
-      user.email,
-    );
+    const currentUser = await this.authService.resendVerification(user.id);
 
     res.status(200).json(toResendVerificationResponseDto({ currentUser }));
   }

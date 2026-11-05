@@ -13,8 +13,11 @@ export class InMemoryGoogleUserRepository implements IGoogleUserRepository {
     return this.googleUsers.find((e) => e.email === email) ?? null;
   }
 
-  async findGoogleUserByUserId(userId: string) {
-    return this.googleUsers.find((e) => e.userId === userId) ?? null;
+  async findByGoogleAccountId(googleAccountId: string) {
+    return (
+      this.googleUsers.find((e) => e.googleAccountId === googleAccountId) ??
+      null
+    );
   }
 
   async create(googleUser: NewGoogleUser) {
@@ -50,5 +53,9 @@ export class InMemoryGoogleUserRepository implements IGoogleUserRepository {
     };
 
     return this.googleUsers[i];
+  }
+
+  get all() {
+    return [...this.googleUsers];
   }
 }

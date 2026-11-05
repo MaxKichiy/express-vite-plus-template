@@ -3,8 +3,8 @@ import { makeAuthService } from "../../../builders/make-auth-service";
 import { aUser } from "../../../builders/a-user";
 import { expectAppError } from "../../../helpers/expect-app-error";
 
-describe("login", () => {
-  it("a correct password returns an access and a refresh token", async () => {
+describe("AuthService.login", () => {
+  it("returns an access and a refresh token for a correct password", async () => {
     const { auth } = makeAuthService({ users: [aUser()] });
 
     const [access, refresh] = await auth.login("ada@x.co", "secret");
@@ -13,7 +13,7 @@ describe("login", () => {
     expect(refresh).toBeTruthy();
   });
 
-  it("a wrong password fails and is logged as a failed attempt", async () => {
+  it("rejects a wrong password with INVALID_CREDENTIALS and logs the failed attempt", async () => {
     const { auth, repos } = makeAuthService({ users: [aUser()] });
 
     await expectAppError(
@@ -24,7 +24,7 @@ describe("login", () => {
       expect.objectContaining({ userId: "u1", message: "Login failed" }),
     );
   });
-  it("a Google-only user (no password) gets INVALID_CREDENTIALS, not a crash", async () => {
+  it("rejects a Google-only user (no password) with INVALID_CREDENTIALS, without crashing", async () => {
     const { auth } = makeAuthService({
       users: [aUser({ passwordHash: null })],
     });
@@ -34,7 +34,7 @@ describe("login", () => {
     });
   });
 
-  it("an unknown email gets the same error as a wrong password", async () => {
+  it("rejects an unknown email with the same error as a wrong password", async () => {
     const { auth } = makeAuthService();
     await expect(auth.login("nobody@x.co", "x")).rejects.toMatchObject({
       code: "INVALID_CREDENTIALS",

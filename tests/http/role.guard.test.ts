@@ -18,12 +18,12 @@ function appWithRole(role: "USER" | "ADMIN") {
   return app;
 }
 
-it("a normal user on an admin-only route gets 403", async () => {
+it("roleGuard rejects a normal user on an admin-only route with 403", async () => {
   const res = await request(appWithRole("USER")).get("/admin-only");
   expect(res.status).toBe(403);
 });
 
-it("an admin gets through", async () => {
+it("roleGuard lets an admin through", async () => {
   const res = await request(appWithRole("ADMIN")).get("/admin-only");
   expect(res.status).toBe(200);
 });

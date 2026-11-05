@@ -4,7 +4,7 @@ import { aUser } from "../../../builders/a-user";
 import { expectAppError } from "../../../helpers/expect-app-error";
 
 describe("AuthService.resetPassword", () => {
-  it("should reject with PASSWORD_RESET_TOKEN_NOT_FOUND if there no active record", async () => {
+  it("rejects with PASSWORD_RESET_TOKEN_NOT_FOUND for an unknown token", async () => {
     const { auth } = makeAuthService({ users: [aUser()] });
 
     await expectAppError(
@@ -13,7 +13,7 @@ describe("AuthService.resetPassword", () => {
     );
   });
 
-  it("should throw an error if user is not found for that token", async () => {
+  it("rejects with USER_NOT_FOUND when the token's user no longer exists", async () => {
     const { auth, repos } = makeAuthService({ users: [aUser()] });
 
     const newReset = await repos.passwordResets.create("fake-id");
@@ -24,7 +24,7 @@ describe("AuthService.resetPassword", () => {
     );
   });
 
-  it("should update user hash with new password", async () => {
+  it("stores the hash of the new password", async () => {
     const user = aUser();
 
     const { auth, repos } = makeAuthService({ users: [user] });
@@ -36,10 +36,11 @@ describe("AuthService.resetPassword", () => {
     expect(repos.users.all[0]?.passwordHash).toBe("hashed:strong");
   });
 
-  it("should works only once for token", async () => {
+  it("accepts a token only once", async () => {
     const { auth, repos } = makeAuthService({ users: [aUser()] });
+    const user = repos.users.all[0]!.id;
 
-    const newReset = await repos.passwordResets.create(repos.users.all[0]!.id!);
+    const newReset = await repos.passwordResets.create(user);
 
     await auth.resetPassword(newReset.token, "strong");
 
@@ -49,7 +50,7 @@ describe("AuthService.resetPassword", () => {
     );
   });
 
-  it("should log successfull reset", async () => {
+  it("logs the reset for that user", async () => {
     const user = aUser();
     const { auth, repos } = makeAuthService({ users: [user] });
 
