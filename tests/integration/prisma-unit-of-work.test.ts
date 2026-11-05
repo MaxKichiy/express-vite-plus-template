@@ -4,7 +4,7 @@ import { expect, it } from "vite-plus/test";
 import { testDb, useCleanDb } from "./test-db";
 
 useCleanDb();
-it("if anything inside throws, nothing is saved", async () => {
+it("PrismaUnitOfWork saves nothing when the work throws", async () => {
   const uow = new PrismaUnitOfWork(testDb);
 
   await expect(

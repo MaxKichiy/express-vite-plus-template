@@ -22,7 +22,7 @@ export function userRepositoryContract(
       expect(await repo.findById(user.id)).toMatchObject({ email: "a@x.co" });
     });
 
-    it("creating a second user with the same email fails", async () => {
+    it("create rejects a second user with the same email", async () => {
       const repo = await make();
 
       await repo.create({ firstName: "A", lastName: "B", email: "a@x.co" });

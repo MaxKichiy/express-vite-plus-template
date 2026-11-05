@@ -21,7 +21,7 @@ function tokenFromlastEmail(mailer: RecordingMailer) {
   return new URL(link).searchParams.get("token");
 }
 
-describe("resendEmailVerification", () => {
+describe("EmailVerificationService.resendEmailVerification", () => {
   it("emails a link to the given address, and its token works", async () => {
     const { service, mailer } = setup();
     await service.resendEmailVerification("u1", "ada@x.co");
@@ -34,7 +34,7 @@ describe("resendEmailVerification", () => {
     ).resolves.toBeUndefined();
   });
 
-  it("the older link stops working", async () => {
+  it("makes the older link stop working", async () => {
     const { service, mailer } = setup();
     await service.resendEmailVerification("u1", "ada@x.co");
     const oldToken = tokenFromlastEmail(mailer);
@@ -52,7 +52,7 @@ describe("resendEmailVerification", () => {
     ).resolves.toBeUndefined();
   });
 
-  it("mail provider down: EMAIL_NOT_SENT, with the original error kept as the cause", async () => {
+  it("rejects with EMAIL_NOT_SENT when the mail provider is down, keeping the original error as the cause", async () => {
     const { service, mailer } = setup();
     mailer.willFail();
 
@@ -64,7 +64,7 @@ describe("resendEmailVerification", () => {
     expect(error.cause).toBeInstanceOf(Error);
   });
 
-  it("the token is saved before the email goes out", async () => {
+  it("saves the token before sending the email", async () => {
     const { service, verifications, mailer } = setup();
 
     mailer.willFail();
@@ -75,8 +75,8 @@ describe("resendEmailVerification", () => {
   });
 });
 
-describe("validateEmailVerification", () => {
-  it("a token works only once", async () => {
+describe("EmailVerificationService.validateEmailVerification", () => {
+  it("accepts a token only once", async () => {
     const { service, mailer } = setup();
     await service.resendEmailVerification("u1", "ada@x.co");
     const token = tokenFromlastEmail(mailer);
@@ -89,7 +89,7 @@ describe("validateEmailVerification", () => {
     );
   });
 
-  it("an unknown token is rejected", async () => {
+  it("rejects an unknown token", async () => {
     const { service } = setup();
     await expectAppError(
       service.validateEmailVerification("u1", "made-up"),
@@ -97,7 +97,7 @@ describe("validateEmailVerification", () => {
     );
   });
 
-  it("someone else's token is rejected", async () => {
+  it("rejects another user's token", async () => {
     const { service, mailer } = setup();
     await service.resendEmailVerification("u1", "ada@x.co");
     const adasToken = tokenFromlastEmail(mailer);
@@ -108,7 +108,7 @@ describe("validateEmailVerification", () => {
     );
   });
 
-  it("an expired token is rejected", async () => {
+  it("rejects an expired token", async () => {
     const { service, mailer } = setup({ ttlMs: -1 });
     await service.resendEmailVerification("u1", "ada@x.co");
     const tok = tokenFromlastEmail(mailer);

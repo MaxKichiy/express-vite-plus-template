@@ -43,13 +43,13 @@ describe("AppError → HTTP response", () => {
     expect(res.body).toEqual({ error: code });
   });
 
-  it("client errors (4xx) are not reported to Sentry", async () => {
+  it("does not report client errors (4xx) to Sentry", async () => {
     const { app, reported } = appThatThrows(new AppError("INVALID_DATA"));
     await request(app).post("/boom");
     expect(reported).toEqual([]);
   });
 
-  it("server errors (5xx) are reported, with the original cause attached", async () => {
+  it("reports server errors (5xx) with the original cause attached", async () => {
     const ses = new Error("SES timeout");
     const { app, reported } = appThatThrows(
       new AppError("EMAIL_NOT_SENT", { cause: ses }),
@@ -61,7 +61,7 @@ describe("AppError → HTTP response", () => {
 });
 
 describe("errors that are not AppError", () => {
-  it("a bug (plain Error) → 500 INTERNAL_SERVER_ERROR, reported, message hidden", async () => {
+  it("turns a plain Error into 500 INTERNAL_SERVER_ERROR, reports it, and hides its message", async () => {
     const { app, reported } = appThatThrows(
       new Error("db password is hunter2"),
     );
@@ -71,7 +71,7 @@ describe("errors that are not AppError", () => {
     expect(reported).toHaveLength(1);
   });
 
-  it("malformed JSON from the client → 400, not reported", async () => {
+  it("answers malformed JSON with 400 and does not report it", async () => {
     const { app, reported } = appThatThrows(new Error("never reached"));
     const res = await request(app)
       .post("/boom")
@@ -81,7 +81,7 @@ describe("errors that are not AppError", () => {
     expect(reported).toEqual([]);
   });
 
-  it("a 5xx http-error → 500 INTERNAL_SERVER_ERROR, reported, message hidden", async () => {
+  it("turns a 5xx http-error into 500 INTERNAL_SERVER_ERROR, reports it, and hides its message", async () => {
     const { app, reported } = appThatThrows(
       createHttpError(503, "upstream secret"),
     );

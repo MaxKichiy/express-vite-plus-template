@@ -10,18 +10,14 @@ const input = {
   password: "testpass",
 };
 
-describe("AuthService.signup", () => {
-  it("should reject if user exist", async () => {
+describe("AuthService.signUp", () => {
+  it("rejects with USER_ALREADY_EXIST when the email is taken", async () => {
     const { auth, repos, mailer } = makeAuthService({ users: [aUser()] });
 
-    const newUser = {
-      firstName: "New",
-      lastName: "User",
-      email: "ada@x.co",
-      password: "testpass",
-    };
-
-    await expectAppError(auth.signUp(newUser), "USER_ALREADY_EXIST");
+    await expectAppError(
+      auth.signUp({ ...input, email: aUser().email }),
+      "USER_ALREADY_EXIST",
+    );
     expect(repos.users.all).toHaveLength(1);
     expect(repos.emailVerifications.all).toHaveLength(0);
     expect(mailer.sent).toHaveLength(0);
@@ -40,19 +36,6 @@ describe("AuthService.signup", () => {
       email: "new@x.co",
       role: "USER",
       passwordHash: "hashed:testpass",
-    });
-  });
-
-  it("should create and save the user with correct password", async () => {
-    const { auth, repos } = makeAuthService();
-
-    await auth.signUp(input);
-    const savedUser = repos.users.all[0];
-
-    expect(repos.users.all).toHaveLength(1);
-    expect(savedUser!.passwordHash).toBe("hashed:testpass");
-    expect(repos.emailVerifications.all[0]).toMatchObject({
-      userId: savedUser!.id,
     });
   });
 
@@ -78,20 +61,6 @@ describe("AuthService.signup", () => {
       expect.any(String),
     );
     await expectAppError(auth.refreshToken(accessToken), "INVALID_TOKEN");
-  });
-
-  it("should send email after creatig user", async () => {
-    const { auth, mailer } = makeAuthService();
-    const newUser = {
-      firstName: "New",
-      lastName: "User",
-      email: "ada@x.co",
-      password: "testpass",
-    };
-
-    await auth.signUp(newUser);
-
-    expect(mailer.sent[0]).toMatchObject({ to: newUser.email });
   });
 
   it.todo(
