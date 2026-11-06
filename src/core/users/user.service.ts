@@ -1,13 +1,9 @@
 import { AppError } from "../error";
 import { IUserRepository } from "./IUserRepository";
-import { NewUser, UserChanges } from "./user";
+import { UserChanges } from "./user";
 
 export class UserService {
   constructor(private readonly userRepository: IUserRepository) {}
-
-  async create(user: NewUser) {
-    return await this.userRepository.create(user);
-  }
 
   async findByEmail(email: string) {
     return await this.userRepository.findByEmail(email);

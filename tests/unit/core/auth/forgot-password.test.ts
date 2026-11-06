@@ -30,4 +30,18 @@ describe("AuthService.forgotPassword", () => {
       code: "EMAIL_NOT_SENT",
     });
   });
+
+  it("logs the reset request for that user", async () => {
+    const user = aUser();
+    const { auth, repos } = makeAuthService({ users: [user] });
+
+    await auth.forgotPassword(user.email);
+
+    expect(repos.logs.all).toEqual([
+      expect.objectContaining({
+        userId: user.id,
+        message: "User requested password reset",
+      }),
+    ]);
+  });
 });

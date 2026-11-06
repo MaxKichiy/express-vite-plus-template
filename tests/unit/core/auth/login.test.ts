@@ -4,13 +4,15 @@ import { aUser } from "../../../builders/a-user";
 import { expectAppError } from "../../../helpers/expect-app-error";
 
 describe("AuthService.login", () => {
-  it("returns an access and a refresh token for a correct password", async () => {
+  it("returns an access and a refresh token for a correct password and logs", async () => {
     const { auth } = makeAuthService({ users: [aUser()] });
 
     const [access, refresh] = await auth.login("ada@x.co", "secret");
 
-    expect(access).toBeTruthy();
-    expect(refresh).toBeTruthy();
+    await expect(auth.refreshToken(refresh)).resolves.toEqual(
+      expect.any(String),
+    );
+    await expectAppError(auth.refreshToken(access), "INVALID_TOKEN");
   });
 
   it("rejects a wrong password with INVALID_CREDENTIALS and logs the failed attempt", async () => {
@@ -39,5 +41,15 @@ describe("AuthService.login", () => {
     await expect(auth.login("nobody@x.co", "x")).rejects.toMatchObject({
       code: "INVALID_CREDENTIALS",
     });
+  });
+
+  it("logs a successful login for that user", async () => {
+    const { auth, repos } = makeAuthService({ users: [aUser()] });
+
+    await auth.login("ada@x.co", "secret");
+
+    expect(repos.logs.all).toEqual([
+      expect.objectContaining({ userId: "u1", message: "Login successful" }),
+    ]);
   });
 });
