@@ -1,3 +1,4 @@
+import { env } from "#src/config/env";
 import { IEmailVerificationRepository } from "#src/core/interfaces/IEmailVerification";
 import { IGoogleUserRepository } from "#src/core/interfaces/IGoogleUserRepository";
 import { ILogRepository } from "#src/core/interfaces/ILogRepository";
@@ -26,7 +27,10 @@ export function bootstrapRepositories(prisma: PrismaClient): AppRepositories {
     userRepository: new PrismaUserRepository(prisma),
     logRepository: new PrismaLogRepository(prisma),
     unitOfWork: new PrismaUnitOfWork(prisma),
-    passwordResetRepository: new PrismaPasswordResetRepository(prisma),
+    passwordResetRepository: new PrismaPasswordResetRepository(
+      prisma,
+      env.PASSWORD_RESET_EXPIRE,
+    ),
     emailVerificationRepository: new PrismaEmailVerificationRepository(prisma),
     googleUserRepository: new PrismaGoogleUserRepository(prisma),
   };

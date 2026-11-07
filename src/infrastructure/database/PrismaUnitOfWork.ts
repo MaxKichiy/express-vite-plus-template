@@ -8,6 +8,7 @@ import { PrismaPasswordResetRepository } from "../repositories/prisma-password-r
 import { PrismaLogRepository } from "../repositories/prisma-log.repository";
 import { PrismaEmailVerificationRepository } from "../repositories/prisma-email-verification.repository";
 import { PrismaGoogleUserRepository } from "../repositories/prisma-google-user.repository";
+import { env } from "#src/config/env";
 
 export class PrismaUnitOfWork implements IUnitOfWork {
   constructor(private readonly prisma: PrismaClient) {}
@@ -17,7 +18,10 @@ export class PrismaUnitOfWork implements IUnitOfWork {
   ): Promise<T> {
     return this.prisma.$transaction(async (tx) => {
       const transactionalUsers = new PrismaUserRepository(tx);
-      const passwordResets = new PrismaPasswordResetRepository(tx);
+      const passwordResets = new PrismaPasswordResetRepository(
+        tx,
+        env.PASSWORD_RESET_EXPIRE,
+      );
       const logs = new PrismaLogRepository(tx);
       const emailVerifications = new PrismaEmailVerificationRepository(tx);
       const googleUsers = new PrismaGoogleUserRepository(tx);
