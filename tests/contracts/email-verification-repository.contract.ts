@@ -37,7 +37,16 @@ export function emailVerificationRepositoryContract(
       await expect(repo.expireForUser(ada)).resolves.toEqual({ count: 2 });
       await expect(repo.findValidForUser(ada, token1)).resolves.toBeNull();
       await expect(repo.findValidForUser(ada, token2)).resolves.toBeNull();
-      await expect(repo.findValidForUser(bob, token3)).resolves.not.toBeNull(); // ✅ bob untouched
+      await expect(repo.findValidForUser(bob, token3)).resolves.not.toBeNull();
+    });
+
+    it("create rejects a second verification with the same token", async () => {
+      const { repo, ada, bob } = await make();
+      const token1 = randomUUID();
+
+      await repo.create(ada, token1);
+
+      await expect(repo.create(bob, token1)).rejects.toThrow();
     });
   });
 }
