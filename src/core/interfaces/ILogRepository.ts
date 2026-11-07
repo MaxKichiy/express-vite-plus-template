@@ -6,6 +6,7 @@ export interface Log {
 
 export interface ILogRepository {
   create(userId: string, message: string): Promise<Log>;
+  findByUserId(userId: string): Promise<Log[]>;
 }
 
 export interface ILogService {
