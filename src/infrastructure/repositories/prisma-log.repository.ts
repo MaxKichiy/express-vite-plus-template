@@ -12,4 +12,11 @@ export class PrismaLogRepository implements ILogRepository {
       },
     });
   }
+
+  async findByUserId(userId: string) {
+    return await this.db.log.findMany({
+      where: { userId },
+      orderBy: { createdAt: "asc" },
+    });
+  }
 }

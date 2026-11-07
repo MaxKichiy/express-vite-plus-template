@@ -15,6 +15,10 @@ export class InMemoryLogRepository implements ILogRepository {
     return newLog;
   }
 
+  async findByUserId(userId: string) {
+    return this.logs.filter((l) => l.userId === userId).map((l) => ({ ...l }));
+  }
+
   get all(): readonly Log[] {
     return [...this.logs];
   }
