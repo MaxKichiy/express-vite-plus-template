@@ -1,13 +1,15 @@
-import { env } from "#src/config/env";
 import { IPasswordResetsRepository } from "#src/core/interfaces/IPasswordResetsRepository";
 import { Prisma } from "#src/generated/prisma/client";
 
 export class PrismaPasswordResetRepository implements IPasswordResetsRepository {
-  constructor(private readonly db: Prisma.TransactionClient) {}
+  constructor(
+    private readonly db: Prisma.TransactionClient,
+    private readonly ttlMs: number,
+  ) {}
   async create(userId: string) {
     return await this.db.passwordReset.create({
       data: {
-        expiresAt: new Date(Date.now() + env.PASSWORD_RESET_EXPIRE),
+        expiresAt: new Date(Date.now() + this.ttlMs),
         userId,
       },
     });
