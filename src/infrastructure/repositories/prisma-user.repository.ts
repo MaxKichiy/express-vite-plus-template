@@ -1,10 +1,11 @@
 import { IUserRepository } from "#src/core/users/IUserRepository";
-import { Prisma, User } from "#src/generated/prisma/client";
+import { NewUser, UserChanges } from "#src/core/users/user";
+import { Prisma } from "#src/generated/prisma/client";
 
 export class PrismaUserRepository implements IUserRepository {
   constructor(private readonly db: Prisma.TransactionClient) {}
 
-  async create(user: User) {
+  async create(user: NewUser) {
     return await this.db.user.create({ data: user });
   }
 
@@ -40,7 +41,7 @@ export class PrismaUserRepository implements IUserRepository {
     });
   }
 
-  async update(userId: string, data: User) {
+  async update(userId: string, data: UserChanges) {
     return await this.db.user.update({
       where: {
         id: userId,
