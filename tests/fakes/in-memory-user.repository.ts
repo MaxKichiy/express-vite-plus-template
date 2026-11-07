@@ -1,6 +1,7 @@
 import { IUserRepository } from "#src/core/users/IUserRepository";
 import { NewUser, User, UserChanges } from "#src/core/users/user";
 import { randomUUID } from "crypto";
+import { assertUnique } from "./assert-unique";
 
 function definedOnly<T extends object>(data: T): T {
   return Object.fromEntries(
@@ -12,9 +13,7 @@ export class InMemoryUserRepository implements IUserRepository {
   constructor(private users: User[] = []) {}
 
   async create(data: NewUser) {
-    if (this.users.some((u) => u.email === data.email)) {
-      throw new Error("unique contraint: email");
-    }
+    assertUnique(this.users, data, ["email"]);
 
     const now = new Date();
     const user: User = {

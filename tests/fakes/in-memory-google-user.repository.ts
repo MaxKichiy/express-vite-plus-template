@@ -5,13 +5,10 @@ import {
   NewGoogleUser,
 } from "#src/core/interfaces/IGoogleUserRepository";
 import { randomUUID } from "crypto";
+import { assertUnique } from "./assert-unique";
 
 export class InMemoryGoogleUserRepository implements IGoogleUserRepository {
   constructor(private googleUsers: GoogleUser[] = []) {}
-
-  async findOneByEmail(email: string) {
-    return this.googleUsers.find((e) => e.email === email) ?? null;
-  }
 
   async findByGoogleAccountId(googleAccountId: string) {
     return (
@@ -21,10 +18,11 @@ export class InMemoryGoogleUserRepository implements IGoogleUserRepository {
   }
 
   async create(googleUser: NewGoogleUser) {
-    const existingUser = this.googleUsers.find(
-      (u) => u.googleAccountId === googleUser.googleAccountId,
-    );
-    if (existingUser) throw new Error("unique constraint: google id");
+    assertUnique(this.googleUsers, googleUser, [
+      "googleAccountId",
+      "userId",
+      "email",
+    ]);
 
     const now = new Date();
 
