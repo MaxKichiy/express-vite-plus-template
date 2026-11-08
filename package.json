@@ -2,11 +2,11 @@
   "name": "bee-techy-backend-template",
   "version": "1.0.0",
   "private": true,
+  "description": "Bee Techy backend template",
+  "author": "Bee Techy <contact@beetechy.com>",
   "imports": {
     "#src/*": "./build/src/*.js"
   },
-  "description": "Bee Techy backend template",
-  "author": "Bee Techy <contact@beetechy.com>",
   "scripts": {
     "build": "tsc",
     "check": "vp check",
@@ -58,7 +58,7 @@
     "@types/node": "^26.6.5",
     "@types/supertest": "^7.2.1",
     "@types/swagger-ui-express": "^4.1.8",
-    "@vitest/coverage-v8": "5.0.5",
+    "@vitest/coverage-v8": "catalog:",
     "husky": "^9.1.7",
     "jest": "^30.5.2",
     "prisma": "^7.10.1",
@@ -66,6 +66,7 @@
     "ts-jest": "^29.4.15",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
-    "vite-plus": "^1.4.0"
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
   }
 }
