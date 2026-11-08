@@ -28,7 +28,10 @@ export class AuthController {
       data.body.password,
     );
 
-    res.cookie("refreshToken", refreshToken);
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      sameSite: "strict",
+    });
     res.status(200).json(toLoginResponseDto({ accessToken }));
   }
 

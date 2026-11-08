@@ -58,3 +58,4 @@ coverage/
 .env
 .env.*
 !.env.example
+.vitest/
