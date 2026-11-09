@@ -9,7 +9,11 @@ export class HealthController {
 
   async health(_req: Request, res: Response) {
     const { database } = await this.healthService.check();
-    res.status(200).json(toHealthResponseDto({ database }));
+    if (database) {
+      res.status(200).json(toHealthResponseDto({ database }));
+    } else {
+      res.status(503).json(toHealthResponseDto({ database }));
+    }
   }
 
   ready(_req: Request, res: Response) {
