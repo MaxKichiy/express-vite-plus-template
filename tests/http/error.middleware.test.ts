@@ -5,6 +5,8 @@ import createHttpError from "http-errors";
 import { describe, expect, it } from "vite-plus/test";
 
 import request from "supertest";
+import { testApp } from "./test-app";
+import { aUser } from "../builders/a-user";
 
 function appThatThrows(err: unknown) {
   const reported: unknown[] = [];
@@ -89,5 +91,31 @@ describe("errors that are not AppError", () => {
     expect(res.status).toBe(500);
     expect(res.body).toEqual({ error: "INTERNAL_SERVER_ERROR" });
     expect(reported).toHaveLength(1);
+  });
+});
+
+describe("error reporting in the real app", () => {
+  it("does not report a wrong password", async () => {
+    const { app, reported } = testApp([aUser()]);
+    await request(app)
+      .post("/api/auth/login")
+      .send({ email: "ada@x.co", password: "Wr0ng!pass" })
+      .expect(401);
+    expect(reported).toEqual([]);
+  });
+
+  it("reports a failed email once, as 502 EMAIL_NOT_SENT", async () => {
+    const { app, mailer, reported } = testApp([aUser()]);
+    mailer.willFail();
+
+    const res = await request(app)
+      .post("/api/auth/forgot-password")
+      .send({ email: "ada@x.co" });
+
+    expect(res.status).toBe(502);
+    expect(res.body).toEqual({ error: "EMAIL_NOT_SENT" });
+    expect(reported).toEqual([
+      expect.objectContaining({ code: "EMAIL_NOT_SENT" }),
+    ]);
   });
 });

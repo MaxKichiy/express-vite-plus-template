@@ -52,4 +52,10 @@ describe("JwtTokenSigner", () => {
 
     expect(await new JwtTokenSigner("secret").verify(forged)).toBeNull();
   });
+
+  it("sign rejects when the secret is empty", async () => {
+    await expect(
+      new JwtTokenSigner("").sign({ id: "u1" }, 60_000),
+    ).rejects.toThrow("secretOrPrivateKey must have a value");
+  });
 });

@@ -67,6 +67,27 @@ describe("POST /api/auth/signup", () => {
     expect(res.headers["set-cookie"]?.[0]).toMatch(/^refreshToken=.+HttpOnly/);
   });
 
+  it("sets a refresh cookie that /refresh-token accepts", async () => {
+    const { app } = testApp();
+    const browser = request.agent(app);
+    await browser
+      .post("/api/auth/signup")
+      .send({
+        firstName: "Ada",
+        lastName: "L",
+        email: "ada@x.co",
+        password: "Str0ng!pass",
+      })
+      .expect(201);
+    const res = await browser.post("/api/auth/refresh-token");
+
+    expect(res.status).toBe(200);
+    const me = await request(app)
+      .get("/api/me")
+      .set("Authorization", `Bearer ${res.body.data.accessToken}`);
+    expect(me.body.data.currentUser).toMatchObject({ email: "ada@x.co" });
+  });
+
   it("returns 429 TOO_MANY_REQUESTS for an eleven request within a five minute", async () => {
     const { app } = testApp();
     for (let n = 0; n < 10; n++) {
@@ -587,6 +608,24 @@ describe("POST /api/auth/google/callback", () => {
       .post("/api/auth/google/callback")
       .send({ credential: "tok-jane" });
     expect(res.headers["set-cookie"]?.[0]).toMatch(/^refreshToken=.+HttpOnly/);
+  });
+
+  it("sets a refresh cookie that /refresh-token accepts", async () => {
+    const { app, google } = testApp();
+    google.givenToken("tok-jane", { email: "jane@gmail.com" });
+    const browser = request.agent(app);
+    await browser
+      .post("/api/auth/google/callback")
+      .send({ credential: "tok-jane" })
+      .expect(200);
+
+    const res = await browser.post("/api/auth/refresh-token");
+
+    expect(res.status).toBe(200);
+    const me = await request(app)
+      .get("/api/me")
+      .set("Authorization", `Bearer ${res.body.data.accessToken}`);
+    expect(me.body.data.currentUser).toMatchObject({ email: "jane@gmail.com" });
   });
 
   it("returns 400 INVALID_DATA if nothing passed", async () => {
