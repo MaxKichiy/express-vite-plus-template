@@ -82,6 +82,7 @@ export default defineConfig({
         "src/main/index.ts",
         "src/main/instrument.ts",
         "src/infrastructure/database/prisma.ts",
+        "src/http/routes/sentry.route.ts",
       ],
       thresholds: { 100: true },
     },

@@ -39,7 +39,7 @@ export function validate(schema: z.ZodType<ValidateSchemaType>) {
     }
 
     if (result.data["query"] !== undefined) {
-      req.query = result.data["query"];
+      Object.defineProperty(req, "query", { value: result.data["query"] });
     }
 
     next();

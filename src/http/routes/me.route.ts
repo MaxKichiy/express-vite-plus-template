@@ -16,7 +16,7 @@ export function createMeRouter(
   meRouter.get(
     "/",
     tokenGuard.authenticate,
-    createUserLimiter(time.ONE_SECOND, 5),
+    createUserLimiter(time.ONE_MINUTE, 30),
     catchHandler(meController.getMe.bind(meController)),
   );
 

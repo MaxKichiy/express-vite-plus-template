@@ -20,6 +20,7 @@ export interface AppRepositories {
   passwordResetRepository: IPasswordResetsRepository;
   emailVerificationRepository: IEmailVerificationRepository;
   googleUserRepository: IGoogleUserRepository;
+  pingDatabase: () => Promise<void>;
 }
 
 export function bootstrapRepositories(prisma: PrismaClient): AppRepositories {
@@ -33,5 +34,8 @@ export function bootstrapRepositories(prisma: PrismaClient): AppRepositories {
     ),
     emailVerificationRepository: new PrismaEmailVerificationRepository(prisma),
     googleUserRepository: new PrismaGoogleUserRepository(prisma),
+    pingDatabase: async () => {
+      await prisma.$executeRaw`SELECT 1`;
+    },
   };
 }

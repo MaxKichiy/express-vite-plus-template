@@ -5,6 +5,16 @@ import rateLimit, {
   ValueDeterminingMiddleware,
 } from "express-rate-limit";
 
+export const ipKey = (req: Pick<Request, "ip">) =>
+  req.ip === undefined ? "" : ipKeyGenerator(req.ip);
+
+export const userKey = (req: Pick<Request, "user">) => {
+  if (!req.user) {
+    throw new Error("createUserLimiter must run after tokenGuard.authenticate");
+  }
+  return req.user.id;
+};
+
 export const limiterFactory = (
   keyGenerator: ValueDeterminingMiddleware<string>,
   windowMs: number,
@@ -23,20 +33,8 @@ export const limiterFactory = (
   });
 };
 
-export const ipLimiter = (windowMs: number, limit: number) => {
-  return limiterFactory(
-    (req: Request) => (req.ip === undefined ? "" : ipKeyGenerator(req.ip)),
-    windowMs,
-    limit,
-  );
-};
+export const ipLimiter = (windowMs: number, limit: number) =>
+  limiterFactory(ipKey, windowMs, limit);
 
-export const createUserLimiter = (windowMs: number, limit: number) => {
-  return limiterFactory(
-    (req: Request): string => {
-      return req?.user?.id || "";
-    },
-    windowMs,
-    limit,
-  );
-};
+export const createUserLimiter = (windowMs: number, limit: number) =>
+  limiterFactory(userKey, windowMs, limit);

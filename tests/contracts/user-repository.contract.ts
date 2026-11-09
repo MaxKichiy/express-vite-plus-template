@@ -31,5 +31,19 @@ export function userRepositoryContract(
         repo.create({ firstName: "B", lastName: "L", email: "a@x.co" }),
       ).rejects.toThrow();
     });
+
+    it("update user", async () => {
+      const repo = await make();
+      const user = await repo.create({
+        firstName: "A",
+        lastName: "B",
+        email: "a@x.co",
+      });
+      await repo.update(user.id, {
+        firstName: "B",
+      });
+
+      expect(await repo.findById(user.id)).toMatchObject({ firstName: "B" });
+    });
   });
 }

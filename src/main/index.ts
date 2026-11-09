@@ -6,7 +6,8 @@ import { createMainRouter } from "#src/http/routes/index";
 import { createApp } from "#src/http/app";
 import { env } from "#src/config/env";
 import { bootstrapRepositories } from "./repositories.container";
-import { bootstrapServices } from "./services.container";
+import { bootstrapServices, realAdapters } from "./services.container";
+import * as Sentry from "@sentry/node";
 
 let server: http.Server | null = null;
 
@@ -14,9 +15,9 @@ async function main(): Promise<void> {
   await prisma.$connect();
 
   const repos = bootstrapRepositories(prisma);
-  const services = bootstrapServices(repos);
+  const services = bootstrapServices(repos, realAdapters());
   const mainRouter = createMainRouter(services);
-  const app = createApp(mainRouter);
+  const app = createApp(mainRouter, (err) => Sentry.captureException(err));
 
   server = app.listen(env.PORT, () => {
     console.info(`Server is running on port ${env.PORT}`);

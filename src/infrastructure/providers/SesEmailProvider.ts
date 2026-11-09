@@ -1,14 +1,13 @@
-import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
+import { SendEmailCommand } from "@aws-sdk/client-ses";
 import { IEmailProvider } from "../../core/interfaces/IEmailProvider";
 
-export class SesEmailProvider implements IEmailProvider {
-  private sesClient: SESClient;
-  private fromEmail: string;
+export type SesSender = { send(command: SendEmailCommand): Promise<unknown> };
 
-  constructor(config: { region: string; fromEmail: string }) {
-    this.sesClient = new SESClient({ region: config.region });
-    this.fromEmail = config.fromEmail;
-  }
+export class SesEmailProvider implements IEmailProvider {
+  constructor(
+    private readonly sesClient: SesSender,
+    private readonly fromEmail: string,
+  ) {}
 
   async sendEmail(
     to: string,

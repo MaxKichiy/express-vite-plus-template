@@ -15,14 +15,6 @@ export class PrismaEmailVerificationRepository implements IEmailVerificationRepo
     });
   }
 
-  async deleteById(id: string) {
-    return await this.db.emailVerification.delete({
-      where: {
-        id,
-      },
-    });
-  }
-
   async expireForUser(userId: string) {
     return await this.db.emailVerification.updateMany({
       where: {

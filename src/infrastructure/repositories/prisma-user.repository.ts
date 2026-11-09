@@ -25,22 +25,6 @@ export class PrismaUserRepository implements IUserRepository {
     });
   }
 
-  async delete(userId: string) {
-    return await this.db.user.delete({
-      where: {
-        id: userId,
-      },
-    });
-  }
-
-  async findByPhone(phoneNumber: string) {
-    return await this.db.user.findFirst({
-      where: {
-        phoneNumber,
-      },
-    });
-  }
-
   async update(userId: string, data: UserChanges) {
     return await this.db.user.update({
       where: {

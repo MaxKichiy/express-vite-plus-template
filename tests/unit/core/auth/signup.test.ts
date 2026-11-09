@@ -62,8 +62,4 @@ describe("AuthService.signUp", () => {
     );
     await expectAppError(auth.refreshToken(accessToken), "INVALID_TOKEN");
   });
-
-  it.todo(
-    "when the verification email fails: decide EMAIL_NOT_SENT vs still sign up",
-  );
 });
