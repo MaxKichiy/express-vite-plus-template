@@ -33,8 +33,8 @@ export function createAuthRouter(
 
   authRouter.post(
     "/login",
+    ipLimiter(time.ONE_MINUTE, 5),
     validate(LoginSchema),
-    ipLimiter(time.ONE_SECOND, 5),
     catchHandler(authController.login.bind(authController)),
   );
 
@@ -67,8 +67,8 @@ export function createAuthRouter(
 
   authRouter.post(
     "/signup",
-    validate(SignUpSchema),
     ipLimiter(time.FIVE_MINUTES, 10),
+    validate(SignUpSchema),
     catchHandler(authController.signUp.bind(authController)),
   );
 
@@ -101,8 +101,8 @@ export function createAuthRouter(
 
   authRouter.post(
     "/google/callback",
+    ipLimiter(time.ONE_MINUTE, 5),
     validate(GoogleOAuthCallbackSchema),
-    ipLimiter(time.ONE_SECOND, 5),
     catchHandler(authController.googleCallback.bind(authController)),
   );
 
@@ -136,8 +136,8 @@ export function createAuthRouter(
   authRouter.post(
     "/verify-email",
     tokenGuard.authenticate,
+    createUserLimiter(time.ONE_HOUR, 10),
     validate(VerifyEmailSchema),
-    createUserLimiter(time.TEN_SECONDS, 10),
     catchHandler(authController.verifyEmail.bind(authController)),
   );
 
@@ -254,8 +254,8 @@ export function createAuthRouter(
 
   authRouter.post(
     "/reset-password",
-    validate(ResetPasswordSchema),
     ipLimiter(time.ONE_MINUTE, 1),
+    validate(ResetPasswordSchema),
     catchHandler(authController.resetPassword.bind(authController)),
   );
 

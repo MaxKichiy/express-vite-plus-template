@@ -11,11 +11,12 @@ import { fakeSigner } from "../fakes/fake-signer";
 export function testApp(users: User[] = []) {
   const repos = inMemoryRepos(users);
   const mailer = new RecordingMailer();
+  const google = new FakeGoogleVerifier();
   const services = bootstrapServices(repos, {
     mailer,
+    google,
     signer: fakeSigner,
     passwords: fakePasswordEncryption,
-    google: new FakeGoogleVerifier(),
   });
-  return { app: createApp(createMainRouter(services)), mailer, repos }; // ✅ REAL routes, validators, controllers, core
+  return { app: createApp(createMainRouter(services)), mailer, repos, google };
 }
