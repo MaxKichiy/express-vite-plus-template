@@ -1,6 +1,5 @@
 import { AppError, ErrorCode } from "#src/core/error";
 import { ErrorRequestHandler } from "express";
-import * as Sentry from "@sentry/node";
 
 import { isHttpError } from "http-errors";
 
@@ -22,7 +21,7 @@ const STATUS: Record<ErrorCode, number> = {
   EMAIL_NOT_SENT: 502,
 };
 
-type Report = (err: unknown) => void;
+export type Report = (err: unknown) => void;
 
 export function createErrorMiddleware(report: Report): ErrorRequestHandler {
   return (err, _req, res, _next) => {
@@ -38,7 +37,3 @@ export function createErrorMiddleware(report: Report): ErrorRequestHandler {
     return res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
   };
 }
-
-export const errorMiddleware = createErrorMiddleware((err) =>
-  Sentry.captureException(err),
-);

@@ -16,6 +16,7 @@ import { IEmailProvider } from "#src/core/interfaces/IEmailProvider";
 import { ITokenSigner } from "#src/core/interfaces/ITokenSigner";
 import { IPasswordEncryption } from "#src/core/interfaces/IPasswordEncryption";
 import { IGoogleVerifier } from "#src/core/interfaces/IGoogleVerifier";
+import { SESClient } from "@aws-sdk/client-ses";
 
 export interface Adapters {
   mailer: IEmailProvider;
@@ -26,10 +27,10 @@ export interface Adapters {
 
 export function realAdapters(): Adapters {
   return {
-    mailer: new SesEmailProvider({
-      region: env.AWS_SES_REGION,
-      fromEmail: env.AWS_SES_SENDER,
-    }),
+    mailer: new SesEmailProvider(
+      new SESClient({ region: env.AWS_SES_REGION }),
+      env.AWS_SES_SENDER,
+    ),
     signer: new JwtTokenSigner(env.JWT_SECRET_KEY),
     passwords: new PasswordEncryption(),
     google: new GoogleVerifier(
@@ -39,13 +40,10 @@ export function realAdapters(): Adapters {
   };
 }
 
-export function bootstrapServices(
-  repos: AppRepositories,
-  adapters: Adapters = realAdapters(),
-) {
+export function bootstrapServices(repos: AppRepositories, adapters: Adapters) {
   const emailService = new EmailService(adapters.mailer, env.APP_URL);
   const userService = new UserService(repos.userRepository);
-  const healthService = new HealthService();
+  const healthService = new HealthService(repos.pingDatabase);
   const emailVerificationService = new EmailVerificationService(
     emailService,
     repos.emailVerificationRepository,

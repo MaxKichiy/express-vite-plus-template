@@ -8,8 +8,11 @@ import { RecordingMailer } from "../fakes/recording-mailer";
 import { inMemoryRepos } from "../helpers/in-memory-repos";
 import { fakeSigner } from "../fakes/fake-signer";
 
-export function testApp(users: User[] = []) {
-  const repos = inMemoryRepos(users);
+export function testApp(
+  users: User[] = [],
+  options: { databaseUp?: boolean } = {},
+) {
+  const repos = inMemoryRepos(users, options);
   const mailer = new RecordingMailer();
   const google = new FakeGoogleVerifier();
   const services = bootstrapServices(repos, {
@@ -18,5 +21,15 @@ export function testApp(users: User[] = []) {
     signer: fakeSigner,
     passwords: fakePasswordEncryption,
   });
-  return { app: createApp(createMainRouter(services)), mailer, repos, google };
+  const reported: unknown[] = [];
+  const app = createApp(createMainRouter(services), (err) =>
+    reported.push(err),
+  );
+  return {
+    app,
+    mailer,
+    repos,
+    google,
+    reported,
+  };
 }

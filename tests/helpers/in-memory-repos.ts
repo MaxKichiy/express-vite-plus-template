@@ -7,7 +7,10 @@ import { InMemoryLogRepository } from "../fakes/in-memory-log.repository";
 import { InMemoryPasswordResetRepository } from "../fakes/in-memory-password-reset.repository";
 import { InMemoryUserRepository } from "../fakes/in-memory-user.repository";
 
-export function inMemoryRepos(users: User[]): AppRepositories {
+export function inMemoryRepos(
+  users: User[],
+  { databaseUp = true } = {},
+): AppRepositories {
   const repos = {
     users: new InMemoryUserRepository(users),
     passwordResets: new InMemoryPasswordResetRepository(),
@@ -23,5 +26,8 @@ export function inMemoryRepos(users: User[]): AppRepositories {
     logRepository: repos.logs,
     emailVerificationRepository: repos.emailVerifications,
     googleUserRepository: repos.googleUsers,
+    pingDatabase: async () => {
+      if (!databaseUp) throw new Error("database down");
+    },
   };
 }

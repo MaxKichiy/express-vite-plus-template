@@ -19,7 +19,16 @@ export const bearerAuth = registry.registerComponent(
   },
 );
 
-export const setupSwagger = (app: Express) => {
+export type SwaggerOptions = {
+  enabled: boolean;
+  users: Record<string, string>;
+};
+
+export const setupSwagger = (
+  app: Express,
+  { enabled, users }: SwaggerOptions,
+) => {
+  if (!enabled) return;
   const generator = new OpenApiGeneratorV3(registry.definitions);
 
   const document = generator.generateDocument({
@@ -37,13 +46,9 @@ export const setupSwagger = (app: Express) => {
 
   const auth = basicAuth({
     challenge: true,
-    users: {
-      admin: "admin",
-    },
+    users: users,
   });
 
-  if (env.NODE_ENV !== "production") {
-    app.use("/api-docs", auth, swaggerUi.serve, swaggerUi.setup(document));
-    app.use("/openapi.json", (_, res) => res.json(document));
-  }
+  app.use("/api-docs", auth, swaggerUi.serve, swaggerUi.setup(document));
+  app.use("/openapi.json", (_, res) => res.json(document));
 };

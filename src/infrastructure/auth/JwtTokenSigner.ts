@@ -10,15 +10,7 @@ export class JwtTokenSigner implements ITokenSigner {
         claims,
         this.secret,
         { expiresIn: Math.floor(expiresInMs / 1000) },
-        (err, token) => {
-          if (err) {
-            return reject(new Error(err.message));
-          }
-
-          if (token) {
-            resolve(token);
-          }
-        },
+        (err, token) => (err || !token ? reject(err) : resolve(token)),
       );
     });
   }

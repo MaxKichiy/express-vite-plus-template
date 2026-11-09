@@ -1,20 +1,11 @@
-import { prisma } from "#src/infrastructure/database/prisma";
-
 export class HealthService {
-  async checkDatabase() {
-    try {
-      await prisma.$executeRaw`SELECT 1`;
-      return true;
-    } catch {
-      return false;
-    }
-  }
+  constructor(private readonly pingDatabase: () => Promise<void>) {}
 
   async check() {
-    const [database] = await Promise.all([this.checkDatabase()]);
-
-    return {
-      database,
-    };
+    const database = await this.pingDatabase().then(
+      () => true,
+      () => false,
+    );
+    return { database };
   }
 }

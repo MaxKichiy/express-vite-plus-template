@@ -1,9 +1,9 @@
-import { errorMiddleware } from "#src/http/middlewares/error.middleware";
 import { roleGuard } from "#src/http/middlewares/role.guard";
 import { expect, it } from "vite-plus/test";
 import { aUser } from "../builders/a-user";
 import request from "supertest";
 import { testApp } from "./test-app";
+import { createErrorMiddleware } from "#src/http/middlewares/error.middleware";
 
 function appWithRole(role: "USER" | "ADMIN") {
   const app = testApp().app;
@@ -14,7 +14,7 @@ function appWithRole(role: "USER" | "ADMIN") {
   app.get("/admin-only", roleGuard(["ADMIN"]), (_req, res) =>
     res.json({ ok: true }),
   );
-  app.use(errorMiddleware);
+  app.use(createErrorMiddleware(() => {}));
   return app;
 }
 
