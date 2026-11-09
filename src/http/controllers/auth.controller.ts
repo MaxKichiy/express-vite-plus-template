@@ -16,6 +16,7 @@ import { SignUpRequest } from "../validators/sign-up.validator";
 import { VerifyEmailRequest } from "../validators/verify-email.validator";
 import { AuthService } from "#src/core/services/auth.service";
 import { User } from "#src/core/users/user";
+const REFRESH_COOKIE = { httpOnly: true, sameSite: "strict" } as const;
 
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -28,10 +29,7 @@ export class AuthController {
       data.body.password,
     );
 
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      sameSite: "strict",
-    });
+    res.cookie("refreshToken", refreshToken, REFRESH_COOKIE);
     res.status(200).json(toLoginResponseDto({ accessToken }));
   }
 
@@ -40,7 +38,7 @@ export class AuthController {
     const { accessToken, currentUser, refreshToken } =
       await this.authService.signUp(data.body);
 
-    res.cookie("refreshToken", refreshToken);
+    res.cookie("refreshToken", refreshToken, REFRESH_COOKIE);
     res.status(201).json(toSignUpResponseDto({ accessToken, currentUser }));
   }
 
@@ -50,7 +48,7 @@ export class AuthController {
     const { accessToken, currentUser, refreshToken } =
       await this.authService.googleAuth(data.body.credential);
 
-    res.cookie("refreshToken", refreshToken);
+    res.cookie("refreshToken", refreshToken, REFRESH_COOKIE);
     res
       .status(200)
       .json(toGoogleOAuthCallbackResponseDto({ accessToken, currentUser }));
