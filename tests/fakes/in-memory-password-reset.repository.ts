@@ -1,12 +1,12 @@
 import {
-  IPasswordResetsRepository,
+  PasswordResetRepository,
   PasswordReset,
-} from "#src/core/interfaces/IPasswordResetsRepository";
+} from "#src/core/interfaces/password-reset.repository";
 import { randomUUID } from "crypto";
 
 const ONE_HOUR = 60 * 60 * 1000;
 
-export class InMemoryPasswordResetRepository implements IPasswordResetsRepository {
+export class InMemoryPasswordResetRepository implements PasswordResetRepository {
   private rows: PasswordReset[];
   constructor(
     seed: PasswordReset[] = [],

@@ -1,6 +1,6 @@
-import { ITokenSigner } from "#src/core/interfaces/ITokenSigner";
+import { TokenSigner } from "#src/core/interfaces/token-signer";
 
-export const fakeSigner: ITokenSigner = {
+export const fakeSigner: TokenSigner = {
   sign: async (claims, expiresInMs) =>
     JSON.stringify({ claims, expiresAt: Date.now() + expiresInMs }),
   verify: async (token) => {

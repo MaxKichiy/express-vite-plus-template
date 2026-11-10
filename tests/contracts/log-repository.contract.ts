@@ -1,8 +1,8 @@
-import { ILogRepository } from "#src/core/interfaces/ILogRepository";
+import { LogRepository } from "#src/core/interfaces/log.repository";
 import { describe, expect, it } from "vite-plus/test";
 
 type Setup = {
-  repo: ILogRepository;
+  repo: LogRepository;
   ada: string;
   bob: string;
 };
@@ -11,7 +11,7 @@ export function makeLogRepositoryContract(
   name: string,
   make: () => Promise<Setup>,
 ) {
-  describe(`${name} keeps the ILogRepository contract`, () => {
+  describe(`${name} keeps the LogRepository contract`, () => {
     it("returns newly created log", async () => {
       const { repo, ada } = await make();
 

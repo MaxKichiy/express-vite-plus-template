@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vite-plus/test";
-import { makeAuthService } from "../../../builders/make-auth-service";
+import { makeAuthUseCases } from "../../../builders/make-auth-use-cases";
 import { expectAppError } from "../../../helpers/expect-app-error";
 import { FakeGoogleVerifier } from "../../../fakes/fake-google-verifier";
 import { aUser } from "../../../builders/a-user";
@@ -14,15 +14,15 @@ const input = {
 
 function setup(users: User[] = []) {
   const google = new FakeGoogleVerifier().givenToken("valid-cred", input);
-  return makeAuthService({ users, google });
+  return makeAuthUseCases({ users, google });
 }
 
-describe("AuthService.googleAuth", () => {
+describe("SignInWithGoogleUseCase", () => {
   it("rejects with INVALID_CREDENTIALS when Google rejects the credential", async () => {
     const { auth } = setup();
 
     await expectAppError(
-      auth.googleAuth("invalid-creds"),
+      auth.signInWithGoogle.execute("invalid-creds"),
       "INVALID_CREDENTIALS",
     );
   });
@@ -32,7 +32,10 @@ describe("AuthService.googleAuth", () => {
 
     await repos.googleUsers.create({ ...input, userId: "deleted-user" });
 
-    await expectAppError(auth.googleAuth("valid-cred"), "USER_NOT_FOUND");
+    await expectAppError(
+      auth.signInWithGoogle.execute("valid-cred"),
+      "USER_NOT_FOUND",
+    );
   });
 
   it("logs into the linked user when the Google account is already linked", async () => {
@@ -40,7 +43,7 @@ describe("AuthService.googleAuth", () => {
 
     await repos.googleUsers.create({ ...input, userId: "test" });
 
-    expect(await auth.googleAuth("valid-cred")).toMatchObject({
+    expect(await auth.signInWithGoogle.execute("valid-cred")).toMatchObject({
       currentUser: {
         id: "test",
         firstName: aUser().firstName,
@@ -53,7 +56,7 @@ describe("AuthService.googleAuth", () => {
     const { auth, repos } = setup([
       aUser({ emailVerifiedAt: null, email: input.email }),
     ]);
-    await auth.googleAuth("valid-cred");
+    await auth.signInWithGoogle.execute("valid-cred");
     expect(repos.users.all).toHaveLength(1);
 
     expect(repos.users.all[0]?.emailVerifiedAt).not.toBeNull();
@@ -68,7 +71,7 @@ describe("AuthService.googleAuth", () => {
   it("creates a verified user with Google's names when the email is new, and links them", async () => {
     const { auth, repos } = setup();
 
-    const { currentUser } = await auth.googleAuth("valid-cred");
+    const { currentUser } = await auth.signInWithGoogle.execute("valid-cred");
 
     expect(repos.users.all).toEqual([
       expect.objectContaining({
@@ -95,7 +98,7 @@ describe("AuthService.googleAuth", () => {
       }),
     ]);
 
-    await auth.googleAuth("valid-cred");
+    await auth.signInWithGoogle.execute("valid-cred");
 
     expect(repos.users.all[0]?.passwordHash).toBe("hashed:mine");
     expect(repos.googleUsers.all).toEqual([
@@ -106,11 +109,15 @@ describe("AuthService.googleAuth", () => {
   it("returns working tokens for that user", async () => {
     const { auth } = setup();
 
-    const { accessToken, refreshToken } = await auth.googleAuth("valid-cred");
+    const { accessToken, refreshToken } =
+      await auth.signInWithGoogle.execute("valid-cred");
 
-    await expect(auth.refreshToken(refreshToken)).resolves.toEqual(
-      expect.any(String),
+    await expect(
+      auth.refreshAccessToken.execute(refreshToken),
+    ).resolves.toEqual(expect.any(String));
+    await expectAppError(
+      auth.refreshAccessToken.execute(accessToken),
+      "INVALID_TOKEN",
     );
-    await expectAppError(auth.refreshToken(accessToken), "INVALID_TOKEN");
   });
 });

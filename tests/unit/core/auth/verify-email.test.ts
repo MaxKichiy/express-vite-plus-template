@@ -1,29 +1,32 @@
 import { describe, expect, it } from "vite-plus/test";
-import { makeAuthService } from "../../../builders/make-auth-service";
+import { makeAuthUseCases } from "../../../builders/make-auth-use-cases";
 import { expectAppError } from "../../../helpers/expect-app-error";
 import { aUser } from "../../../builders/a-user";
 
 const user = aUser({ id: "u1", emailVerifiedAt: null });
 
 async function withToken() {
-  const ctx = makeAuthService({ users: [user] });
+  const ctx = makeAuthUseCases({ users: [user] });
   await ctx.repos.emailVerifications.create(user.id, "good-token");
   return ctx;
 }
 
-describe("AuthService.verifyEmail", () => {
+describe("VerifyEmailUseCase", () => {
   it("rejects with USER_NOT_FOUND for unknown user", async () => {
-    const { auth } = makeAuthService();
+    const { auth } = makeAuthUseCases();
 
     await expectAppError(
-      auth.verifyEmail("fake-id", "fake-token"),
+      auth.verifyEmail.execute("fake-id", "fake-token"),
       "USER_NOT_FOUND",
     );
   });
   it("saves the user as verified for a valid token", async () => {
     const { auth, repos } = await withToken();
 
-    const { currentUser } = await auth.verifyEmail(user.id, "good-token");
+    const { currentUser } = await auth.verifyEmail.execute(
+      user.id,
+      "good-token",
+    );
 
     expect(repos.users.all[0]?.emailVerifiedAt).toEqual(expect.any(Date));
     expect(currentUser.emailVerifiedAt).toEqual(expect.any(Date));
@@ -31,10 +34,10 @@ describe("AuthService.verifyEmail", () => {
 
   it("accepts a token only once", async () => {
     const { auth } = await withToken();
-    await auth.verifyEmail(user.id, "good-token");
+    await auth.verifyEmail.execute(user.id, "good-token");
 
     await expectAppError(
-      auth.verifyEmail(user.id, "good-token"),
+      auth.verifyEmail.execute(user.id, "good-token"),
       "INVALID_DATA",
     );
   });
@@ -42,7 +45,7 @@ describe("AuthService.verifyEmail", () => {
   it("throw INVALID_DATA when passing wrong token", async () => {
     const { auth } = await withToken();
     await expectAppError(
-      auth.verifyEmail(user.id, "fake-token"),
+      auth.verifyEmail.execute(user.id, "fake-token"),
       "INVALID_DATA",
     );
   });

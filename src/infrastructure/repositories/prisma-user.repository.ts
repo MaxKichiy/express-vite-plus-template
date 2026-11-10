@@ -1,8 +1,8 @@
-import { IUserRepository } from "#src/core/users/IUserRepository";
+import { UserRepository } from "#src/core/users/user.repository";
 import { NewUser, UserChanges } from "#src/core/users/user";
 import { Prisma } from "#src/generated/prisma/client";
 
-export class PrismaUserRepository implements IUserRepository {
+export class PrismaUserRepository implements UserRepository {
   constructor(private readonly db: Prisma.TransactionClient) {}
 
   async create(user: NewUser) {

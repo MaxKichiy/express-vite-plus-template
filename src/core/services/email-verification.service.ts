@@ -1,13 +1,13 @@
 import { randomUUID } from "node:crypto";
 
 import { EmailService } from "./email/email.service";
-import { IEmailVerificationRepository } from "../interfaces/IEmailVerification";
 import { AppError } from "../error";
+import { EmailVerificationRepository } from "../interfaces/email-verification.repository";
 
 export class EmailVerificationService {
   constructor(
     private readonly emailService: EmailService,
-    private readonly emailVerificationRepository: IEmailVerificationRepository,
+    private readonly emailVerificationRepository: EmailVerificationRepository,
   ) {}
 
   async validateEmailVerification(userId: string, verificationToken: string) {

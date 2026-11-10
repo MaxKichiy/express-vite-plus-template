@@ -1,9 +1,9 @@
 import type {
   GoogleIdentity,
-  IGoogleVerifier,
-} from "#src/core/interfaces/IGoogleVerifier";
+  GoogleVerifier,
+} from "#src/core/interfaces/google-verifier";
 
-export class FakeGoogleVerifier implements IGoogleVerifier {
+export class FakeGoogleVerifier implements GoogleVerifier {
   private readonly identities = new Map<string, GoogleIdentity>();
 
   givenToken(credential: string, identity: Partial<GoogleIdentity> = {}) {

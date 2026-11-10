@@ -5,6 +5,6 @@ export interface GoogleIdentity {
   lastName: string;
 }
 
-export interface IGoogleVerifier {
+export interface GoogleVerifier {
   verify(credential: string): Promise<GoogleIdentity | null>;
 }

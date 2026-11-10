@@ -1,13 +1,13 @@
 import {
   GoogleUser,
   GoogleUserUpdate,
-  IGoogleUserRepository,
+  GoogleUserRepository,
   NewGoogleUser,
-} from "#src/core/interfaces/IGoogleUserRepository";
+} from "#src/core/interfaces/google-user.repository";
 import { randomUUID } from "crypto";
 import { assertUnique } from "./assert-unique";
 
-export class InMemoryGoogleUserRepository implements IGoogleUserRepository {
+export class InMemoryGoogleUserRepository implements GoogleUserRepository {
   constructor(private googleUsers: GoogleUser[] = []) {}
 
   async findByGoogleAccountId(googleAccountId: string) {

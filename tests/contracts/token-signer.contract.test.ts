@@ -1,16 +1,16 @@
-import { ITokenSigner } from "#src/core/interfaces/ITokenSigner";
+import { TokenSigner } from "#src/core/interfaces/token-signer";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 import { fakeSigner } from "../fakes/fake-signer";
-import { JwtTokenSigner } from "#src/infrastructure/auth/JwtTokenSigner";
+import { JwtTokenSigner } from "#src/infrastructure/auth/jwt-token-signer";
 
 afterEach(() => vi.useRealTimers());
-const implementations: [string, ITokenSigner][] = [
+const implementations: [string, TokenSigner][] = [
   ["JwtTokenSigner", new JwtTokenSigner("secret")],
   ["fakeSigner", fakeSigner],
 ];
 
 describe.each(implementations)(
-  "%s keeps the ITokenSigner contract",
+  "%s keeps the TokenSigner contract",
   (_name, signer) => {
     it("verify returns exactly what sign was given", async () => {
       const token = await signer.sign({ type: "refresh", id: "u1" }, 60_000);

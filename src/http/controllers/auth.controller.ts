@@ -14,17 +14,18 @@ import { LoginRequest } from "../validators/login.validator";
 import { ResetPasswordRequest } from "../validators/reset-password.validator";
 import { SignUpRequest } from "../validators/sign-up.validator";
 import { VerifyEmailRequest } from "../validators/verify-email.validator";
-import { AuthService } from "#src/core/services/auth.service";
 import { User } from "#src/core/users/user";
+import { AuthUseCases } from "#src/core/auth/index";
+
 const REFRESH_COOKIE = { httpOnly: true, sameSite: "strict" } as const;
 
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly auth: AuthUseCases) {}
 
   async login(req: Request, res: Response) {
     const data: LoginRequest = req;
 
-    const [accessToken, refreshToken] = await this.authService.login(
+    const { accessToken, refreshToken } = await this.auth.login.execute(
       data.body.email,
       data.body.password,
     );
@@ -36,7 +37,7 @@ export class AuthController {
   async signUp(req: Request, res: Response) {
     const data: SignUpRequest = req;
     const { accessToken, currentUser, refreshToken } =
-      await this.authService.signUp(data.body);
+      await this.auth.signUp.execute(data.body);
 
     res.cookie("refreshToken", refreshToken, REFRESH_COOKIE);
     res.status(201).json(toSignUpResponseDto({ accessToken, currentUser }));
@@ -46,7 +47,7 @@ export class AuthController {
     const data: GoogleOAuthCallbackRequest = req;
 
     const { accessToken, currentUser, refreshToken } =
-      await this.authService.googleAuth(data.body.credential);
+      await this.auth.signInWithGoogle.execute(data.body.credential);
 
     res.cookie("refreshToken", refreshToken, REFRESH_COOKIE);
     res
@@ -57,7 +58,7 @@ export class AuthController {
   async verifyEmail(req: Request, res: Response) {
     const data: VerifyEmailRequest = req;
     const user = req.user as User;
-    const { currentUser } = await this.authService.verifyEmail(
+    const { currentUser } = await this.auth.verifyEmail.execute(
       user.id,
       data.body.token,
     );
@@ -67,13 +68,15 @@ export class AuthController {
 
   async resendVerification(req: Request, res: Response) {
     const user = req.user as User;
-    const currentUser = await this.authService.resendVerification(user.id);
+    const currentUser = await this.auth.resendVerificationEmail.execute(
+      user.id,
+    );
 
     res.status(200).json(toResendVerificationResponseDto({ currentUser }));
   }
 
   async refreshToken(req: Request, res: Response) {
-    const accessToken = await this.authService.refreshToken(
+    const accessToken = await this.auth.refreshAccessToken.execute(
       req.cookies["refreshToken"],
     );
     res.status(200).json(toRefreshTokenResponseDto({ accessToken }));
@@ -81,14 +84,14 @@ export class AuthController {
 
   async forgotPassword(req: Request, res: Response) {
     const data: ForgotPasswordRequest = req;
-    await this.authService.forgotPassword(data.body.email);
+    await this.auth.requestPasswordReset.execute(data.body.email);
 
     res.status(200).json(toForgotPasswordResponseDto());
   }
 
   async resetPassword(req: Request, res: Response) {
     const data: ResetPasswordRequest = req;
-    await this.authService.resetPassword(
+    await this.auth.resetPassword.execute(
       data.body.token,
       data.body.newPassword,
     );

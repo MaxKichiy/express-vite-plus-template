@@ -1,8 +1,8 @@
 import { env } from "#src/config/env";
-import { JwtTokenSigner } from "#src/infrastructure/auth/JwtTokenSigner";
-import { PasswordEncryption } from "#src/infrastructure/auth/password-encryption";
-import { GoogleVerifier } from "#src/infrastructure/providers/GoogleVerifier";
-import { SesEmailProvider } from "#src/infrastructure/providers/SesEmailProvider";
+import { JwtTokenSigner } from "#src/infrastructure/auth/jwt-token-signer";
+import { BcryptPasswordHasher } from "#src/infrastructure/auth/bcrypt-password-hasher";
+import { GoogleAuthLibraryVerifier } from "#src/infrastructure/providers/google-auth-library-verifier";
+import { SesEmailProvider } from "#src/infrastructure/providers/ses-email-provider";
 import { realAdapters } from "#src/main/services.container";
 import { describe, expect, it } from "vite-plus/test";
 
@@ -12,8 +12,8 @@ describe("realAdapters", () => {
 
     expect(adapters.mailer).toBeInstanceOf(SesEmailProvider);
     expect(adapters.signer).toBeInstanceOf(JwtTokenSigner);
-    expect(adapters.passwords).toBeInstanceOf(PasswordEncryption);
-    expect(adapters.google).toBeInstanceOf(GoogleVerifier);
+    expect(adapters.passwords).toBeInstanceOf(BcryptPasswordHasher);
+    expect(adapters.google).toBeInstanceOf(GoogleAuthLibraryVerifier);
   });
 
   it("signs tokens with the JWT secret from env", async () => {

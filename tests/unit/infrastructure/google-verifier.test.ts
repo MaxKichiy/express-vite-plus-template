@@ -1,9 +1,9 @@
 import { LoginTicket, type TokenPayload } from "google-auth-library";
 import { describe, expect, it } from "vite-plus/test";
 import {
-  GoogleVerifier,
+  GoogleAuthLibraryVerifier,
   type IdTokenClient,
-} from "#src/infrastructure/providers/GoogleVerifier";
+} from "#src/infrastructure/providers/google-auth-library-verifier";
 
 const goodPayload: TokenPayload = {
   iss: "https://accounts.google.com",
@@ -25,7 +25,10 @@ function googleThatReturns(payload: TokenPayload) {
       return new LoginTicket("envelope", payload);
     },
   };
-  return { verifier: new GoogleVerifier(client, "our-client-id"), calls };
+  return {
+    verifier: new GoogleAuthLibraryVerifier(client, "our-client-id"),
+    calls,
+  };
 }
 
 describe("GoogleVerifier.verify", () => {
@@ -74,7 +77,7 @@ describe("GoogleVerifier.verify", () => {
       },
     };
     await expect(
-      new GoogleVerifier(client, "our-client-id").verify("cred"),
+      new GoogleAuthLibraryVerifier(client, "our-client-id").verify("cred"),
     ).resolves.toBeNull();
   });
 });

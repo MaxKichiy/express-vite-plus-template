@@ -1,25 +1,31 @@
 import { describe, expect, it } from "vite-plus/test";
-import { makeAuthService } from "../../../builders/make-auth-service";
+import { makeAuthUseCases } from "../../../builders/make-auth-use-cases";
 import { aUser } from "../../../builders/a-user";
 import { expectAppError } from "../../../helpers/expect-app-error";
 
-describe("AuthService.login", () => {
+describe("LoginUseCase", () => {
   it("returns an access and a refresh token for a correct password and logs", async () => {
-    const { auth } = makeAuthService({ users: [aUser()] });
+    const { auth } = makeAuthUseCases({ users: [aUser()] });
 
-    const [access, refresh] = await auth.login("ada@x.co", "secret");
-
-    await expect(auth.refreshToken(refresh)).resolves.toEqual(
-      expect.any(String),
+    const { accessToken, refreshToken } = await auth.login.execute(
+      "ada@x.co",
+      "secret",
     );
-    await expectAppError(auth.refreshToken(access), "INVALID_TOKEN");
+
+    await expect(
+      auth.refreshAccessToken.execute(refreshToken),
+    ).resolves.toEqual(expect.any(String));
+    await expectAppError(
+      auth.refreshAccessToken.execute(accessToken),
+      "INVALID_TOKEN",
+    );
   });
 
   it("rejects a wrong password with INVALID_CREDENTIALS and logs the failed attempt", async () => {
-    const { auth, repos } = makeAuthService({ users: [aUser()] });
+    const { auth, repos } = makeAuthUseCases({ users: [aUser()] });
 
     await expectAppError(
-      auth.login("ada@x.co", "wrong"),
+      auth.login.execute("ada@x.co", "wrong"),
       "INVALID_CREDENTIALS",
     );
     expect(repos.logs.all).toContainEqual(
@@ -27,26 +33,28 @@ describe("AuthService.login", () => {
     );
   });
   it("rejects a Google-only user (no password) with INVALID_CREDENTIALS, without crashing", async () => {
-    const { auth } = makeAuthService({
+    const { auth } = makeAuthUseCases({
       users: [aUser({ passwordHash: null })],
     });
 
-    await expect(auth.login("ada@x.co", "anything")).rejects.toMatchObject({
+    await expect(
+      auth.login.execute("ada@x.co", "anything"),
+    ).rejects.toMatchObject({
       code: "INVALID_CREDENTIALS",
     });
   });
 
   it("rejects an unknown email with the same error as a wrong password", async () => {
-    const { auth } = makeAuthService();
-    await expect(auth.login("nobody@x.co", "x")).rejects.toMatchObject({
+    const { auth } = makeAuthUseCases();
+    await expect(auth.login.execute("nobody@x.co", "x")).rejects.toMatchObject({
       code: "INVALID_CREDENTIALS",
     });
   });
 
   it("logs a successful login for that user", async () => {
-    const { auth, repos } = makeAuthService({ users: [aUser()] });
+    const { auth, repos } = makeAuthUseCases({ users: [aUser()] });
 
-    await auth.login("ada@x.co", "secret");
+    await auth.login.execute("ada@x.co", "secret");
 
     expect(repos.logs.all).toEqual([
       expect.objectContaining({ userId: "u1", message: "Login successful" }),

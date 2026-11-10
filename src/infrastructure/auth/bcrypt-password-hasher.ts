@@ -1,7 +1,7 @@
-import { IPasswordEncryption } from "#src/core/interfaces/IPasswordEncryption";
+import { PasswordHasher } from "#src/core/interfaces/password-hasher";
 import bcryptjs from "bcryptjs";
 
-export class PasswordEncryption implements IPasswordEncryption {
+export class BcryptPasswordHasher implements PasswordHasher {
   private readonly salt: number = 12;
 
   constructor() {}

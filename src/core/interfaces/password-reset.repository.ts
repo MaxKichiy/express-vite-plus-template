@@ -7,7 +7,7 @@ export interface PasswordReset {
   updatedAt: Date;
 }
 
-export interface IPasswordResetsRepository {
+export interface PasswordResetRepository {
   create(userId: string): Promise<PasswordReset>;
   expire(id: string): Promise<PasswordReset>;
   find(token: string): Promise<PasswordReset | null>;

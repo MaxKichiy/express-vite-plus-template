@@ -1,15 +1,15 @@
-import { IPasswordResetsRepository } from "#src/core/interfaces/IPasswordResetsRepository";
+import { PasswordResetRepository } from "#src/core/interfaces/password-reset.repository";
 import { randomUUID } from "crypto";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
-type Setup = { repo: IPasswordResetsRepository; ada: string; ttlMs: number };
+type Setup = { repo: PasswordResetRepository; ada: string; ttlMs: number };
 const fakeId = randomUUID();
 
 export function passwordResetRepositoryContract(
   name: string,
   make: () => Promise<Setup>,
 ) {
-  describe(`${name} keeps the IPasswordResetsRepository contract`, () => {
+  describe(`${name} keeps the PasswordResetsRepository contract`, () => {
     afterEach(() => vi.useRealTimers());
     it("create new password reset", async () => {
       const { repo, ada } = await make();

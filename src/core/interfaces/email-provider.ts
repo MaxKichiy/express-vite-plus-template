@@ -1,4 +1,4 @@
-export interface IEmailProvider {
+export interface EmailProvider {
   sendEmail(
     to: string,
     subject: string,

@@ -1,7 +1,7 @@
-import { IGoogleUserRepository } from "#src/core/interfaces/IGoogleUserRepository";
+import { GoogleUserRepository } from "#src/core/interfaces/google-user.repository";
 import { describe, expect, it } from "vite-plus/test";
 
-type Setup = { repo: IGoogleUserRepository; ada: string; bob: string };
+type Setup = { repo: GoogleUserRepository; ada: string; bob: string };
 
 const inputData = (
   userId: string,
@@ -19,7 +19,7 @@ export function googleUserRepositoryContract(
   name: string,
   make: () => Promise<Setup>,
 ) {
-  describe(`${name} keeps the IGoogleUserRepository contract`, () => {
+  describe(`${name} keeps the GoogleUserRepository contract`, () => {
     it("findByGoogleAccountId returns the link that create saved", async () => {
       const { repo, ada } = await make();
       const newGoogleUser = await repo.create(inputData(ada));

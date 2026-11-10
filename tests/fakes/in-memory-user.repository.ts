@@ -1,4 +1,4 @@
-import { IUserRepository } from "#src/core/users/IUserRepository";
+import { UserRepository } from "#src/core/users/user.repository";
 import { NewUser, User, UserChanges } from "#src/core/users/user";
 import { randomUUID } from "crypto";
 import { assertUnique } from "./assert-unique";
@@ -9,7 +9,7 @@ function definedOnly<T extends object>(data: T): T {
   ) as T;
 }
 
-export class InMemoryUserRepository implements IUserRepository {
+export class InMemoryUserRepository implements UserRepository {
   constructor(private users: User[] = []) {}
 
   async create(data: NewUser) {

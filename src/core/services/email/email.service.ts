@@ -2,11 +2,11 @@ import {
   resetPasswordEmail,
   verificationEmail,
 } from "#src/core/services/email/email-templates";
-import { IEmailProvider } from "../../interfaces/IEmailProvider";
+import { EmailProvider } from "../../interfaces/email-provider";
 
 export class EmailService {
   constructor(
-    private readonly mailer: IEmailProvider,
+    private readonly mailer: EmailProvider,
     private readonly appUrl: string,
   ) {}
 

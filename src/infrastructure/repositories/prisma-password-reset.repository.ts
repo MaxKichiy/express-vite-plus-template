@@ -1,7 +1,7 @@
-import { IPasswordResetsRepository } from "#src/core/interfaces/IPasswordResetsRepository";
+import { PasswordResetRepository } from "#src/core/interfaces/password-reset.repository";
 import { Prisma } from "#src/generated/prisma/client";
 
-export class PrismaPasswordResetRepository implements IPasswordResetsRepository {
+export class PrismaPasswordResetRepository implements PasswordResetRepository {
   constructor(
     private readonly db: Prisma.TransactionClient,
     private readonly ttlMs: number,

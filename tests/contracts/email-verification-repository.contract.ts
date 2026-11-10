@@ -1,14 +1,14 @@
-import { IEmailVerificationRepository } from "#src/core/interfaces/IEmailVerification";
+import { EmailVerificationRepository } from "#src/core/interfaces/email-verification.repository";
 import { randomUUID } from "crypto";
 import { describe, expect, it } from "vite-plus/test";
 
-type Setup = { repo: IEmailVerificationRepository; ada: string; bob: string };
+type Setup = { repo: EmailVerificationRepository; ada: string; bob: string };
 
 export function emailVerificationRepositoryContract(
   name: string,
   make: () => Promise<Setup>,
 ) {
-  describe(`${name} keeps the IEmailVerificationRepository contract`, () => {
+  describe(`${name} keeps the EmailVerificationRepository contract`, () => {
     it("findValidForUser finds a fresh token for its owner", async () => {
       const { repo, ada } = await make();
       const token = randomUUID();

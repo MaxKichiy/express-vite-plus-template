@@ -1,10 +1,9 @@
 import { describe, expect, it } from "vite-plus/test";
 import { aUser } from "../../builders/a-user";
 import { expectAppError } from "../../helpers/expect-app-error";
-import { ITokenSigner } from "#src/core/interfaces/ITokenSigner";
+import { TokenSigner } from "#src/core/interfaces/token-signer";
 import { fakeSigner } from "../../fakes/fake-signer";
 import { TokenService } from "#src/core/services/token.service";
-import { UserService } from "#src/core/users/user.service";
 import { InMemoryUserRepository } from "../../fakes/in-memory-user.repository";
 
 const user = aUser();
@@ -12,7 +11,7 @@ const TTL = { access: 60, refresh: 600 };
 
 function setup(users = [user]) {
   const signed: { claims: object; ttl: number }[] = [];
-  const signer: ITokenSigner = {
+  const signer: TokenSigner = {
     sign: async (claims, ttl) => {
       signed.push({ claims, ttl });
       return fakeSigner.sign(claims, ttl);
@@ -21,7 +20,7 @@ function setup(users = [user]) {
   };
   const tokens = new TokenService(
     signer,
-    new UserService(new InMemoryUserRepository(users)),
+    new InMemoryUserRepository(users),
     TTL,
   );
   return { tokens, signed };

@@ -1,13 +1,13 @@
 import {
   EmailVerification,
-  IEmailVerificationRepository,
-} from "#src/core/interfaces/IEmailVerification";
+  EmailVerificationRepository,
+} from "#src/core/interfaces/email-verification.repository";
 import { randomUUID } from "crypto";
 import { assertUnique } from "./assert-unique";
 
 const ONE_DAY = 24 * 60 * 60 * 1000;
 
-export class InMemoryEmailVerificationRepository implements IEmailVerificationRepository {
+export class InMemoryEmailVerificationRepository implements EmailVerificationRepository {
   private rows: EmailVerification[] = [];
   constructor(private readonly ttlMs = ONE_DAY) {}
 

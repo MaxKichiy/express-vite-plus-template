@@ -1,15 +1,15 @@
-import { IPasswordEncryption } from "#src/core/interfaces/IPasswordEncryption";
-import { PasswordEncryption } from "#src/infrastructure/auth/password-encryption";
+import { BcryptPasswordHasher } from "#src/infrastructure/auth/bcrypt-password-hasher";
 import { describe, expect, it } from "vite-plus/test";
-import { fakePasswordEncryption } from "../fakes/fake-password-encryption";
+import { fakePasswordHasher } from "../fakes/fake-password-hasher";
+import { PasswordHasher } from "#src/core/interfaces/password-hasher";
 
-const implementations: [string, IPasswordEncryption][] = [
-  ["PasswordEncryption", new PasswordEncryption()],
-  ["fakePasswordEncryption", fakePasswordEncryption],
+const implementations: [string, PasswordHasher][] = [
+  ["PasswordHasher", new BcryptPasswordHasher()],
+  ["fakePasswordHasher", fakePasswordHasher],
 ];
 
 describe.each(implementations)(
-  "%s keeps the IPasswordEncryption contract",
+  "%s keeps the IPasswordHasher contract",
   (_name, encryption) => {
     it("compare returns true for the password that was hashed", async () => {
       const hash = await encryption.hash("s3cret!");
@@ -23,8 +23,8 @@ describe.each(implementations)(
   },
 );
 
-describe("PasswordEncryption", () => {
-  const encryption = new PasswordEncryption();
+describe("PasswordHasher", () => {
+  const encryption = new BcryptPasswordHasher();
 
   it("hash never contains the plain password", async () => {
     await expect(encryption.hash("s3cret!")).resolves.not.toContain("s3cret!");

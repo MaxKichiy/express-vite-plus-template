@@ -3,7 +3,7 @@ import { describe, expect, it } from "vite-plus/test";
 import {
   SesEmailProvider,
   type SesSender,
-} from "#src/infrastructure/providers/SesEmailProvider";
+} from "#src/infrastructure/providers/ses-email-provider";
 
 function recordingSes() {
   const sent: SendEmailCommand[] = [];

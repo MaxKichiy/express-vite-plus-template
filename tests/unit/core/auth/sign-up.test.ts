@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vite-plus/test";
-import { makeAuthService } from "../../../builders/make-auth-service";
+import { makeAuthUseCases } from "../../../builders/make-auth-use-cases";
 import { aUser } from "../../../builders/a-user";
 import { expectAppError } from "../../../helpers/expect-app-error";
 
@@ -10,12 +10,12 @@ const input = {
   password: "testpass",
 };
 
-describe("AuthService.signUp", () => {
+describe("SignUpUseCase", () => {
   it("rejects with USER_ALREADY_EXIST when the email is taken", async () => {
-    const { auth, repos, mailer } = makeAuthService({ users: [aUser()] });
+    const { auth, repos, mailer } = makeAuthUseCases({ users: [aUser()] });
 
     await expectAppError(
-      auth.signUp({ ...input, email: aUser().email }),
+      auth.signUp.execute({ ...input, email: aUser().email }),
       "USER_ALREADY_EXIST",
     );
     expect(repos.users.all).toHaveLength(1);
@@ -24,9 +24,9 @@ describe("AuthService.signUp", () => {
   });
 
   it("saves the user with a hashed password and the USER role", async () => {
-    const { auth, repos } = makeAuthService();
+    const { auth, repos } = makeAuthUseCases();
 
-    await auth.signUp(input);
+    await auth.signUp.execute(input);
     const savedUser = repos.users.all[0];
 
     expect(repos.users.all).toHaveLength(1);
@@ -40,9 +40,9 @@ describe("AuthService.signUp", () => {
   });
 
   it("emails the same token it saved for that user", async () => {
-    const { auth, repos, mailer } = makeAuthService();
+    const { auth, repos, mailer } = makeAuthUseCases();
 
-    const { currentUser } = await auth.signUp(input);
+    const { currentUser } = await auth.signUp.execute(input);
 
     const [saved] = repos.emailVerifications.all;
     expect(saved?.userId).toBe(currentUser.id);
@@ -51,15 +51,26 @@ describe("AuthService.signUp", () => {
     expect(mailer.sent[0]?.body.text).toContain(`token=${saved?.token}`);
   });
 
-  it("returns the new user with a working refresh token", async () => {
-    const { auth } = makeAuthService();
+  it("rejects with EMAIL_NOT_SENT when the mail provider is down", async () => {
+    const { auth, mailer } = makeAuthUseCases();
+    mailer.willFail();
 
-    const { currentUser, accessToken, refreshToken } = await auth.signUp(input);
+    await expectAppError(auth.signUp.execute(input), "EMAIL_NOT_SENT");
+  });
+
+  it("returns the new user with a working refresh token", async () => {
+    const { auth } = makeAuthUseCases();
+
+    const { currentUser, accessToken, refreshToken } =
+      await auth.signUp.execute(input);
 
     expect(currentUser.email).toBe("new@x.co");
-    await expect(auth.refreshToken(refreshToken)).resolves.toEqual(
-      expect.any(String),
+    await expect(
+      auth.refreshAccessToken.execute(refreshToken),
+    ).resolves.toEqual(expect.any(String));
+    await expectAppError(
+      auth.refreshAccessToken.execute(accessToken),
+      "INVALID_TOKEN",
     );
-    await expectAppError(auth.refreshToken(accessToken), "INVALID_TOKEN");
   });
 });

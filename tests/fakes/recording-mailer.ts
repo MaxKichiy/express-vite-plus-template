@@ -1,8 +1,8 @@
-import { IEmailProvider } from "#src/core/interfaces/IEmailProvider";
+import { EmailProvider } from "#src/core/interfaces/email-provider";
 
 type Body = { text: string; html: string };
 
-export class RecordingMailer implements IEmailProvider {
+export class RecordingMailer implements EmailProvider {
   sent: { to: string; subject: string; body: Body }[] = [];
   private failNext = false;
 
