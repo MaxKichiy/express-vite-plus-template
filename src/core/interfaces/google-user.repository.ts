@@ -20,7 +20,7 @@ export type GoogleUserUpdate = Partial<
   Omit<GoogleUser, "id" | "userId" | "createdAt" | "updatedAt">
 >;
 
-export interface IGoogleUserRepository {
+export interface GoogleUserRepository {
   findByGoogleAccountId(googleAccountId: string): Promise<GoogleUser | null>;
   create(googleUser: NewGoogleUser): Promise<GoogleUser>;
 }

@@ -1,8 +1,8 @@
 import { env } from "#src/config/env";
-import { IEmailVerificationRepository } from "#src/core/interfaces/IEmailVerification";
+import { EmailVerificationRepository } from "#src/core/interfaces/email-verification.repository";
 import { Prisma } from "#src/generated/prisma/client";
 
-export class PrismaEmailVerificationRepository implements IEmailVerificationRepository {
+export class PrismaEmailVerificationRepository implements EmailVerificationRepository {
   constructor(private readonly db: Prisma.TransactionClient) {}
 
   async create(userId: string, token: string) {

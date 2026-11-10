@@ -1,4 +1,4 @@
-import { IGoogleVerifier } from "#src/core/interfaces/IGoogleVerifier";
+import { GoogleVerifier } from "#src/core/interfaces/google-verifier";
 import { LoginTicket } from "google-auth-library";
 
 export type IdTokenClient = {
@@ -8,7 +8,7 @@ export type IdTokenClient = {
   }): Promise<LoginTicket>;
 };
 
-export class GoogleVerifier implements IGoogleVerifier {
+export class GoogleAuthLibraryVerifier implements GoogleVerifier {
   constructor(
     private readonly client: IdTokenClient,
     private readonly clientId: string,

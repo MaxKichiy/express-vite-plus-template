@@ -1,11 +1,11 @@
 import {
   GoogleUser,
-  IGoogleUserRepository,
+  GoogleUserRepository,
   NewGoogleUser,
-} from "#src/core/interfaces/IGoogleUserRepository";
+} from "#src/core/interfaces/google-user.repository";
 import { Prisma } from "#src/generated/prisma/client";
 
-export class PrismaGoogleUserRepository implements IGoogleUserRepository {
+export class PrismaGoogleUserRepository implements GoogleUserRepository {
   constructor(private readonly db: Prisma.TransactionClient) {}
 
   async findByGoogleAccountId(

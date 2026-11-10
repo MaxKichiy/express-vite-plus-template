@@ -1,7 +1,7 @@
 import {
-  IUnitOfWork,
+  UnitOfWork,
   TransactionalRepositories,
-} from "#src/core/interfaces/IUnitOfWork";
+} from "#src/core/interfaces/unit-of-work";
 import { PrismaUserRepository } from "../repositories/prisma-user.repository";
 import { PrismaClient } from "#src/generated/prisma/client";
 import { PrismaPasswordResetRepository } from "../repositories/prisma-password-reset.repository";
@@ -10,7 +10,7 @@ import { PrismaEmailVerificationRepository } from "../repositories/prisma-email-
 import { PrismaGoogleUserRepository } from "../repositories/prisma-google-user.repository";
 import { env } from "#src/config/env";
 
-export class PrismaUnitOfWork implements IUnitOfWork {
+export class PrismaUnitOfWork implements UnitOfWork {
   constructor(private readonly prisma: PrismaClient) {}
 
   async runInTransaction<T>(

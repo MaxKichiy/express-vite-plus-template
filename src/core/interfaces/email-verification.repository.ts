@@ -7,7 +7,7 @@ export type EmailVerification = {
   updatedAt: Date;
 };
 
-export interface IEmailVerificationRepository {
+export interface EmailVerificationRepository {
   create(userId: string, token: string): Promise<EmailVerification>;
   expireForUser(userId: string): Promise<{ count: number }>; //this is workaround for Prisma<BatchPayload>
   findValidForUser(

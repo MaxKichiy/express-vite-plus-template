@@ -1,7 +1,7 @@
-import { ILogRepository, Log } from "#src/core/interfaces/ILogRepository";
+import { LogRepository, Log } from "#src/core/interfaces/log.repository";
 import { randomUUID } from "crypto";
 
-export class InMemoryLogRepository implements ILogRepository {
+export class InMemoryLogRepository implements LogRepository {
   constructor(private logs: Log[] = []) {}
 
   async create(userId: string, message: string) {

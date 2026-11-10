@@ -1,7 +1,7 @@
-import { ITokenSigner } from "#src/core/interfaces/ITokenSigner";
+import { TokenSigner } from "#src/core/interfaces/token-signer";
 import jwt from "jsonwebtoken";
 
-export class JwtTokenSigner implements ITokenSigner {
+export class JwtTokenSigner implements TokenSigner {
   constructor(private readonly secret: string) {}
 
   sign(claims: Record<string, unknown>, expiresInMs: number) {

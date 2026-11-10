@@ -1,4 +1,4 @@
-export interface ITokenSigner {
+export interface TokenSigner {
   sign(claims: Record<string, unknown>, expiresInMs: number): Promise<string>;
   /** Returns exactly the claims passed to sign(), or null if the token is
    *  invalid, expired or tampered with. Never throws for a bad token. */

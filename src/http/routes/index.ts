@@ -12,7 +12,7 @@ import { TokenGuard } from "../middlewares/token.guard";
 
 export function createMainRouter(services: AppServices): Router {
   const router = Router();
-  const authController = new AuthController(services.authService);
+  const authController = new AuthController(services.auth);
   const healthController = new HealthController(services.healthService);
   const meController = new MeController();
   const tokenGuard = new TokenGuard(services.tokenService);

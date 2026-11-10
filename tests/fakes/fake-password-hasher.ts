@@ -1,6 +1,6 @@
-import { IPasswordEncryption } from "#src/core/interfaces/IPasswordEncryption";
+import { PasswordHasher } from "#src/core/interfaces/password-hasher";
 
-export const fakePasswordEncryption: IPasswordEncryption = {
+export const fakePasswordHasher: PasswordHasher = {
   hash: async (password) => `hashed:${password}`,
   compare: async (password, hash) => {
     if (typeof hash !== "string") throw new Error("Illegal arguments");

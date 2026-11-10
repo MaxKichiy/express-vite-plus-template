@@ -1,8 +1,8 @@
-import { ITokenSigner } from "../interfaces/ITokenSigner";
+import { TokenSigner } from "../interfaces/token-signer";
 import z from "zod";
 import { User, UserRole } from "../users/user";
-import { UserService } from "../users/user.service";
 import { AppError } from "../error";
+import { UserRepository } from "../users/user.repository";
 
 const AccessClaims = z.object({
   type: z.literal("access"),
@@ -14,8 +14,8 @@ const RefreshClaims = z.object({ type: z.literal("refresh"), id: z.string() });
 
 export class TokenService {
   constructor(
-    private readonly signer: ITokenSigner,
-    private readonly userService: UserService,
+    private readonly signer: TokenSigner,
+    private readonly users: UserRepository,
     private readonly ttl: { access: number; refresh: number },
   ) {}
 
@@ -51,10 +51,18 @@ export class TokenService {
       throw new AppError("INVALID_TOKEN");
     }
 
-    try {
-      return await this.userService.findByIdOrThrow(claims.data.id);
-    } catch {
-      throw new AppError("UNAUTHORIZED");
-    }
+    const user = await this.users.findById(claims.data.id);
+    if (!user) throw new AppError("UNAUTHORIZED");
+
+    return user;
+  }
+
+  async issueTokenPair(user: User) {
+    const [accessToken, refreshToken] = await Promise.all([
+      this.generateAccessToken(user),
+      this.generateRefreshToken(user),
+    ]);
+
+    return { accessToken, refreshToken };
   }
 }

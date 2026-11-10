@@ -1,11 +1,11 @@
-import { IUserRepository } from "#src/core/users/IUserRepository";
+import { UserRepository } from "#src/core/users/user.repository";
 import { describe, expect, it } from "vite-plus/test";
 
 export function userRepositoryContract(
   name: string,
-  make: () => Promise<IUserRepository>,
+  make: () => Promise<UserRepository>,
 ) {
-  describe(`${name} keeps the IUserRepository contract`, () => {
+  describe(`${name} keeps the UserRepository contract`, () => {
     it("findByEmail returns null for an unknown email", async () => {
       const repo = await make();
       await expect(repo.findByEmail("nobody@x.co")).resolves.toBeNull();

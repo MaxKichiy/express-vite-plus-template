@@ -1,6 +1,6 @@
 import type { User, NewUser, UserChanges } from "./user";
 
-export interface IUserRepository {
+export interface UserRepository {
   create(data: NewUser): Promise<User>;
   update(id: string, data: UserChanges): Promise<User>;
   findByEmail(email?: string): Promise<User | null>;

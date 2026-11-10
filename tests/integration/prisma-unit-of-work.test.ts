@@ -1,4 +1,4 @@
-import { PrismaUnitOfWork } from "#src/infrastructure/database/PrismaUnitOfWork";
+import { PrismaUnitOfWork } from "#src/infrastructure/database/prisma-unit-of-work";
 import { PrismaUserRepository } from "#src/infrastructure/repositories/prisma-user.repository";
 import { expect, it } from "vite-plus/test";
 import { testDb, useCleanDb } from "./test-db";
